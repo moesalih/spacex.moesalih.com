@@ -65,13 +65,16 @@ module.exports.launches = (event, context, callback) => {
 
 		})
 
-		result += '<small style="opacity:0.5">Source: <a href="https://en.wikipedia.org/wiki/List_of_Falcon_9_and_Falcon_Heavy_launches" target="_blank">List of Falcon 9 and Falcon Heavy launches</a></small><br /><br />'
+		result += '<small style="opacity:0.5">Source: <a href="https://en.wikipedia.org/wiki/List_of_Falcon_9_and_Falcon_Heavy_launches" target="_blank">List of Falcon 9 and Falcon Heavy launches</a></small><br />'
+
+		result += '<small style="opacity:0.5">Created by <a href="http://moesalih.com" target="_blank">Moe Salih</a></small><br /><br />'
+
 		result += '</div></body></html>'
 
 
 		callback(null, {
 			statusCode: 200,
-			headers: {"content-type": "text/html charset=utf-8"},
+			headers: {"content-type": "text/html; charset=utf-8"},
 			body: result,
 		})
 	})
