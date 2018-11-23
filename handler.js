@@ -1,20 +1,51 @@
 'use strict'
-
+const fs = require('fs')
 const request = require('request')
 const cheerio = require('cheerio')
+const mustache = require('mustache')
 
+
+module.exports.launchesApi = (event, context, callback) => {
+	getLaunches(data => {
+		if (!data) {
+			callback(null, { statusCode: 400, body: '' })
+			return
+		}
+		callback(null, {
+			statusCode: 200,
+			headers: {"content-type": "application/json; charset=utf-8"},
+			body: JSON.stringify(data),
+		})
+	})
+}
 
 module.exports.launches = (event, context, callback) => {
+	getLaunches(data => {
+		if (!data) {
+			callback(null, { statusCode: 400, body: '' })
+			return
+		}
 
+		fs.readFile('launches.mustache', 'utf8', (err, template) => {
+			callback(null, {
+				statusCode: 200,
+				headers: {"content-type": "text/html; charset=utf-8"},
+				body: mustache.render(template, data),
+			})
+		})
+
+	})
+}
+
+
+
+function getLaunches(callback) {
 	request.get({
 		url: 'https://en.wikipedia.org/wiki/List_of_Falcon_9_and_Falcon_Heavy_launches',
 	}, function(error, response, body) {
 		if (!body) {
 			console.log(error, response)
-			callback(null, {
-				statusCode: 400,
-				body: '',
-			})
+			callback(null)
 			return
 		}
 
@@ -30,57 +61,33 @@ module.exports.launches = (event, context, callback) => {
 			return true
 		})
 
-
-		var result = '<html><head>'
-		result += '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">'
-		result += '<meta charset="UTF-8">'
-		result += '<title>SpaceX Launches 🚀</title>'
-		result += '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">'
-		result += '</head><body><div class="container"><br />'
-		result += '<h3>SpaceX Launches 🚀</h3><hr />'
-
+		var data = {
+			launches: []
+		}
+		var launch = {}
 		rows.each(function(i, el) {
-
 			var children = $(this).children()
 			if (children.first().attr("rowspan")) {
-
-				var date = removeReferences(children.eq(0).text())
-				var type = removeReferences(children.eq(1).text())
-				var site = removeReferences(children.eq(2).text())
-				var payload = removeReferences(children.eq(3).text())
-				var orbit = removeReferences(children.eq(4).text())
-				var customer = removeReferences(children.eq(5).text())
-
-				result += '<strong>' + date + '</strong><br /><small style="opacity:0.5">'
-				result += type + " • "
-				result += site + " • "
-				result += orbit + "</small><br />"
-				result += payload + " • "
-				result += customer + "<br />"
+				launch = {}
+				launch.date = removeReferences(children.eq(0).text())
+				launch.type = removeReferences(children.eq(1).text())
+				launch.site = removeReferences(children.eq(2).text())
+				launch.payload = removeReferences(children.eq(3).text())
+				launch.orbit = removeReferences(children.eq(4).text())
+				launch.customer = removeReferences(children.eq(5).text())
 			}
 			if (children.first().attr("colspan")) {
-				var note = removeReferences(children.eq(0).text())
-				result += '<div class="small">' + note + '</div><hr />'
+				launch.note = removeReferences(children.eq(0).text())
+				data.launches.push(launch)
 			}
 
 		})
 
-		result += '<small style="opacity:0.5">Source: <a href="https://en.wikipedia.org/wiki/List_of_Falcon_9_and_Falcon_Heavy_launches" target="_blank">List of Falcon 9 and Falcon Heavy launches</a></small><br />'
-
-		result += '<small style="opacity:0.5">Created by <a href="http://moesalih.com" target="_blank">Moe Salih</a></small><br /><br />'
-
-		result += '</div></body></html>'
-
-
-		callback(null, {
-			statusCode: 200,
-			headers: {"content-type": "text/html; charset=utf-8"},
-			body: result,
-		})
+		// console.log(data)
+		callback(data)
 	})
-
 }
 
 function removeReferences(string) {
-	return string.replace(/\[\d+\]/g, "")
+	return string.replace(/\[\d+\]/g, "").replace(/\n$/g, "")
 }

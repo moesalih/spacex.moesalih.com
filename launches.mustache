@@ -1,0 +1,25 @@
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta charset="UTF-8">
+	<title>SpaceX Launches 🚀</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+</head>
+<body>
+	<div class="container">
+		<br /><h3>SpaceX Launches 🚀</h3>
+		<hr />
+
+		{{#launches}}
+			<strong>{{date}}</strong><br />
+			<small style="opacity:0.5">{{type}} • {{site}} • {{orbit}}</small><br />
+			{{payload}} • {{customer}}<br />
+			<div class="small">{{note}}</div>
+			<hr />
+		{{/launches}}
+
+		<small style="opacity:0.5">Source: <a href="https://en.wikipedia.org/wiki/List_of_Falcon_9_and_Falcon_Heavy_launches" target="_blank">List of Falcon 9 and Falcon Heavy launches</a></small><br />
+		<small style="opacity:0.5">Created by <a href="http://moesalih.com" target="_blank">Moe Salih</a></small><br /><br />
+	</div>
+</body>
+</html>
