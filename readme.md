@@ -1,7 +1,18 @@
 
-sls offline start
+# SpaceX Launches 🚀
+
+Parsed in realtime from Wikipedia. Deployed to AWS Lambda using serverless framework.
+
+---
 
 
-sls deploy
+Install [serverless](https://serverless.com/) and configure it with your AWS credentials. Then install npm dependencies.
 
-sls deploy function -f launches
+
+
+Test locally: `sls offline start`
+
+
+Full Deploy: `sls deploy`
+
+Only Function Deploy: `sls deploy function -f launches`
