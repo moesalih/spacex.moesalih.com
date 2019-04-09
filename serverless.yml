@@ -3,7 +3,7 @@ service: spacex-lambda
 
 provider:
   name: aws
-  runtime: nodejs6.10
+  runtime: nodejs8.10
 
 functions:
   launches:
