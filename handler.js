@@ -1,53 +1,55 @@
 'use strict'
 const fs = require('fs')
+const util = require('util')
 const request = require('request')
 const cheerio = require('cheerio')
 const mustache = require('mustache')
 
+const get_ = util.promisify(request.get)
+const readFile_ = util.promisify(fs.readFile);
 
-module.exports.launchesApi = (event, context, callback) => {
-	getLaunches(data => {
-		if (!data) {
-			callback(null, { statusCode: 400, body: '' })
-			return
-		}
-		callback(null, {
+
+module.exports.launchesApi = async (event, context) => {
+	try {
+		let data = await getLaunches()
+		if (!data) { throw null }
+
+		return {
 			statusCode: 200,
 			headers: {"content-type": "application/json; charset=utf-8"},
 			body: JSON.stringify(data),
-		})
-	})
-}
-
-module.exports.launches = (event, context, callback) => {
-	getLaunches(data => {
-		if (!data) {
-			callback(null, { statusCode: 400, body: '' })
-			return
 		}
 
-		fs.readFile('launches.mustache', 'utf8', (err, template) => {
-			callback(null, {
-				statusCode: 200,
-				headers: {"content-type": "text/html; charset=utf-8"},
-				body: mustache.render(template, data),
-			})
-		})
+	} catch(e) {
+		return { statusCode: 400, body: '' }
+	}
+}
 
-	})
+module.exports.launches = async (event, context) => {
+	try {
+		let data = await getLaunches()
+		if (!data) { throw null }
+
+		let template = await readFile_('launches.mustache', 'utf8')
+
+		return {
+			statusCode: 200,
+			headers: {"content-type": "text/html; charset=utf-8"},
+			body: mustache.render(template, data),
+		}
+
+	} catch(e) {
+		return { statusCode: 400, body: '' }
+	}
 }
 
 
 
-function getLaunches(callback) {
-	request.get({
-		url: 'https://en.wikipedia.org/wiki/List_of_Falcon_9_and_Falcon_Heavy_launches',
-	}, function(error, response, body) {
-		if (!body) {
-			console.log(error, response)
-			callback(null)
-			return
-		}
+async function getLaunches(callback) {
+	try {
+
+		let { statusCode, body } = await get_({ url: 'https://en.wikipedia.org/wiki/List_of_Falcon_9_and_Falcon_Heavy_launches', timeout: 5000 })
+		if (!body) { throw null }
 
 		var $ = cheerio.load(body)
 		var futureLaunchesH2 = $("#Future_launches").parent()
@@ -88,8 +90,11 @@ function getLaunches(callback) {
 		})
 
 		// console.log(data)
-		callback(data)
-	})
+		return data
+
+	} catch(e) {
+		return null
+	}
 }
 
 function removeReferences(string) {
