@@ -67,6 +67,7 @@ function getLaunches(callback) {
 		var launch = {}
 		rows.each(function(i, el) {
 			var children = $(this).children()
+			// console.log(children.length)
 			if (children.first().attr("rowspan")) {
 				launch = {}
 				launch.date = removeReferences(children.eq(0).text())
@@ -76,7 +77,10 @@ function getLaunches(callback) {
 				launch.orbit = removeReferences(children.eq(4).text())
 				launch.customer = removeReferences(children.eq(5).text())
 			}
-			if (children.first().attr("colspan")) {
+			else if (!children.first().attr("colspan") && children.length == 1) {
+				launch.type += ', ' + removeReferences(children.eq(0).text())
+			}
+			else if (children.first().attr("colspan")) {
 				launch.note = removeReferences(children.eq(0).text())
 				data.launches.push(launch)
 			}
