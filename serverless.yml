@@ -18,6 +18,12 @@ functions:
       - http:
           path: /api
           method: get
+  launchesCal:
+    handler: handler.launchesCal
+    events:
+      - http:
+          path: /calendar
+          method: get
 
 plugins:
   - serverless-offline

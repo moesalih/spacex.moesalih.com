@@ -4,6 +4,8 @@ const util = require('util')
 const request = require('request')
 const cheerio = require('cheerio')
 const mustache = require('mustache')
+const moment = require('moment-timezone')
+const ical = require('ical-generator')
 
 const get_ = util.promisify(request.get)
 const readFile_ = util.promisify(fs.readFile);
@@ -43,9 +45,44 @@ module.exports.launches = async (event, context) => {
 	}
 }
 
+module.exports.launchesCal = async (event, context) => {
+	try {
+		let data = await getLaunches()
+		if (!data) { throw null }
+
+		data.launches = data.launches.filter(l => !!l.date)
+
+		const timezone = 'UTC'
+		const cal = ical({ domain: 'spacex.moesalih.com', name: 'SpaceX Launches' }).timezone(timezone)
+
+		for (let launch of data.launches) {
+			// console.log(launch)
+			const event = cal.createEvent({
+				start: moment.tz(launch.date, timezone),
+				end: moment.tz(launch.date, timezone).add(1, 'hour'),
+				timezone: timezone,
+				summary: launch.payload + ' • ' + launch.customer,
+				organizer: 'SpaceX <hello@spacex.com>'
+			})
+			const alarm = event.createAlarm({type: 'audio', trigger: 1800});
+		}
+
+		return {
+			statusCode: 200,
+			headers: {"content-type": "text/calendar; charset=utf-8"},
+			body: cal.toString(),
+		}
+
+	} catch(e) {
+		console.log(e)
+		return { statusCode: 400, body: '' }
+	}
+}
 
 
-async function getLaunches(callback) {
+
+
+async function getLaunches() {
 	try {
 
 		let { statusCode, body } = await get_({ url: 'https://en.wikipedia.org/wiki/List_of_Falcon_9_and_Falcon_Heavy_launches', timeout: 5000 })
@@ -72,7 +109,9 @@ async function getLaunches(callback) {
 			// console.log(children.length)
 			if (children.first().attr("rowspan")) {
 				launch = {}
-				launch.date = removeReferences(children.eq(0).text())
+				launch.dateText = removeReferences(children.eq(0).text())
+				launch.dateText = launch.dateText.replace(/(\d\d:\d\d)/, ' $1')
+				if (launch.dateText.match(/(\d\d:\d\d)/)) launch.date = new Date(launch.dateText + ' UTC')
 				launch.type = removeReferences(children.eq(1).text())
 				launch.site = removeReferences(children.eq(2).text())
 				launch.payload = removeReferences(children.eq(3).text())
