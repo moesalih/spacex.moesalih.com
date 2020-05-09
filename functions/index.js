@@ -73,7 +73,8 @@ exports.launchesCal = functions.https.onRequest(async (request, response) => {
 		response.send(cal.toString());
 
 	} catch(e) {
-		response.json({ error: e });
+		console.log(e);
+		response.json({ error: e.message });
 	}
 })
 
@@ -109,6 +110,7 @@ async function getLaunches() {
 				launch.dateText = removeReferences(children.eq(0).text())
 				launch.dateText = launch.dateText.replace(/(\d\d:\d\d)/, ' $1')
 				if (launch.dateText.match(/(\d\d:\d\d)/)) launch.date = new Date(launch.dateText + ' UTC')
+				if (isNaN(launch.date)) launch.date = null
 				launch.type = removeReferences(children.eq(1).text())
 				launch.site = removeReferences(children.eq(2).text())
 				launch.payload = removeReferences(children.eq(3).text())
