@@ -5,7 +5,7 @@
 	<title>SpaceX Launches 🚀</title>
 	<link rel="icon" href="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/232/rocket_1f680.png">
 
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
 	<!-- Global site tag (gtag.js) - Google Analytics -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-33281840-7"></script>
@@ -18,12 +18,12 @@
 
 </head>
 <body>
-	<div class="container my-5">
+	<div class="container-lg my-4 my-lg-5">
 
 		<h3 class="mb-5">SpaceX Launches 🚀</h3>
 
 		<div class="row">
-			<div class="col-lg-9">
+			<div class="col-md-9">
 
 				{{#launches}}
 					<strong>{{dateText}}</strong><br />
@@ -33,7 +33,7 @@
 					<hr />
 				{{/launches}}
 			</div>
-			<div class="col-lg-3 ">
+			<div class="col-md-3 ">
 				<div class="sticky-top pt-3">
 					<div class="rounded small bg-light p-3 ">
 						<div  class="mb-3"><a href="/api" target="_blank">API</a></div>
@@ -57,9 +57,6 @@
 
 		</div>
 
-
-		<!-- <footer class="my-5 small">
-		</footer> -->
 	</div>
 </body>
 </html>
