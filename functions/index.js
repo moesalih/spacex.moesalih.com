@@ -1,4 +1,5 @@
-'use strict'
+const functions = require('firebase-functions');
+
 const fs = require('fs')
 const util = require('util')
 const request = require('request')
@@ -11,41 +12,36 @@ const get_ = util.promisify(request.get)
 const readFile_ = util.promisify(fs.readFile);
 
 
-module.exports.launchesApi = async (event, context) => {
+
+
+
+exports.launchesApi = functions.https.onRequest(async (request, response) => {
 	try {
 		let data = await getLaunches()
 		if (!data) { throw null }
 
-		return {
-			statusCode: 200,
-			headers: {"content-type": "application/json; charset=utf-8"},
-			body: JSON.stringify(data),
-		}
+		response.json(data);
 
 	} catch(e) {
-		return { statusCode: 400, body: '' }
+		response.json({ error: e });
 	}
-}
+})
 
-module.exports.launches = async (event, context) => {
+
+exports.launches = functions.https.onRequest(async (request, response) => {
 	try {
 		let data = await getLaunches()
 		if (!data) { throw null }
 
 		let template = await readFile_('launches.mustache', 'utf8')
-
-		return {
-			statusCode: 200,
-			headers: {"content-type": "text/html; charset=utf-8"},
-			body: mustache.render(template, data),
-		}
+		response.send(mustache.render(template, data));
 
 	} catch(e) {
-		return { statusCode: 400, body: '' }
+		response.json({ error: e });
 	}
-}
+})
 
-module.exports.launchesCal = async (event, context) => {
+exports.launchesCal = functions.https.onRequest(async (request, response) => {
 	try {
 		let data = await getLaunches()
 		if (!data) { throw null }
@@ -69,18 +65,13 @@ module.exports.launchesCal = async (event, context) => {
 			const alarm = event.createAlarm({type: 'audio', trigger: 1800});
 		}
 
-		return {
-			statusCode: 200,
-			headers: {"content-type": "text/calendar; charset=utf-8"},
-			body: cal.toString(),
-		}
+		response.contentType('text/calendar; charset=utf-8')
+		response.send(cal.toString());
 
 	} catch(e) {
-		console.log(e)
-		return { statusCode: 400, body: '' }
+		response.json({ error: e });
 	}
-}
-
+})
 
 
 
