@@ -20,10 +20,11 @@ exports.launchesApi = functions.https.onRequest(async (request, response) => {
 		let data = await getLaunches()
 		if (!data) { throw null }
 
-		response.json(data);
+		response.set('Cache-Control', 'public, max-age=300')
+		response.json(data)
 
 	} catch(e) {
-		response.json({ error: e });
+		response.json({ error: e })
 	}
 })
 
@@ -34,6 +35,8 @@ exports.launches = functions.https.onRequest(async (request, response) => {
 		if (!data) { throw null }
 
 		let template = await readFile_('launches.mustache', 'utf8')
+
+		response.set('Cache-Control', 'public, max-age=300')
 		response.send(mustache.render(template, data));
 
 	} catch(e) {
@@ -66,6 +69,7 @@ exports.launchesCal = functions.https.onRequest(async (request, response) => {
 		}
 
 		response.contentType('text/calendar; charset=utf-8')
+		response.set('Cache-Control', 'public, max-age=300')
 		response.send(cal.toString());
 
 	} catch(e) {
@@ -109,6 +113,7 @@ async function getLaunches() {
 				launch.site = removeReferences(children.eq(2).text())
 				launch.payload = removeReferences(children.eq(3).text())
 				if (launch.payload.includes('Starlink')) launch.payloadIcon = '🛰'
+				if (launch.payload.includes('GPS')) launch.payloadIcon = '📍'
 				launch.orbit = removeReferences(children.eq(4).text())
 				launch.customer = removeReferences(children.eq(5).text())
 			}
@@ -118,6 +123,9 @@ async function getLaunches() {
 			else if (children.first().attr("colspan")) {
 				launch.note = removeReferences(children.eq(0).text())
 				if (launch.note.includes('astronaut')) launch.payloadIcon = '👨‍🚀'
+				if (launch.note.toLowerCase().includes('lunar')) launch.payloadIcon = '🌘'
+				if (launch.note.toLowerCase().includes('classified')) launch.payloadIcon = '👽'
+				if (launch.note.toLowerCase().includes('tourist')) launch.payloadIcon = '👨‍🚀'
 				data.launches.push(launch)
 			}
 
