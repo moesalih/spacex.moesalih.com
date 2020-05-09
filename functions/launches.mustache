@@ -27,9 +27,9 @@
 			<div class="col-md-9">
 
 				{{#launches}}
-					<strong>{{dateText}}</strong><br />
-					{{payload}} • {{customer}}<br />
-					<small style="opacity:0.5">{{type}} • {{site}} • {{orbit}}</small><br />
+					<div class="font-weight-bold">{{dateText}}</div>
+					<div class="my-1">{{payloadIcon}} {{payload}} • {{customer}}</div>
+					<div class="small my-1" style="opacity:0.5">{{type}} • {{site}} • {{orbit}}</div>
 					<div class="small">{{note}}</div>
 					<hr />
 				{{/launches}}
