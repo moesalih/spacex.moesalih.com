@@ -13,6 +13,7 @@ const readFile_ = util.promisify(fs.readFile);
 
 
 
+let cacheControl = 'public, max-age=1800'
 
 
 exports.launchesApi = functions.https.onRequest(async (request, response) => {
@@ -20,7 +21,7 @@ exports.launchesApi = functions.https.onRequest(async (request, response) => {
 		let data = await getLaunches()
 		if (!data) { throw null }
 
-		response.set('Cache-Control', 'public, max-age=300')
+		response.set('Cache-Control', cacheControl)
 		response.json(data)
 
 	} catch(e) {
@@ -36,7 +37,7 @@ exports.launches = functions.https.onRequest(async (request, response) => {
 
 		let template = await readFile_('launches.mustache', 'utf8')
 
-		response.set('Cache-Control', 'public, max-age=300')
+		response.set('Cache-Control', cacheControl)
 		response.send(mustache.render(template, data));
 
 	} catch(e) {
@@ -69,7 +70,7 @@ exports.launchesCal = functions.https.onRequest(async (request, response) => {
 		}
 
 		response.contentType('text/calendar; charset=utf-8')
-		response.set('Cache-Control', 'public, max-age=300')
+		response.set('Cache-Control', cacheControl)
 		response.send(cal.toString());
 
 	} catch(e) {
