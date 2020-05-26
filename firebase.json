@@ -1,6 +1,7 @@
 {
 	"hosting": {
-		"public": "public",
+		"predeploy": "pushd next-app && npm run build && npm run export && popd",
+		"public": "next-app/out",
 		"ignore": [
 			"firebase.json",
 			"**/.*",
@@ -8,16 +9,16 @@
 		],
 		"rewrites": [
 			{
-				"source": "/",
-				"function": "launches"
-			},
-			{
 				"source": "/api",
 				"function": "launchesApi"
 			},
 			{
 				"source": "/calendar",
 				"function": "launchesCal"
+			},
+			{
+				"source": "**",
+				"destination": "/index.html"
 			}
 		]
 	}

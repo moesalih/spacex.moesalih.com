@@ -21,6 +21,8 @@ exports.launchesApi = functions.https.onRequest(async (request, response) => {
 		let data = await getLaunches()
 		if (!data) { throw null }
 
+		response.header('Access-Control-Allow-Origin', '*')
+		response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
 		response.set('Cache-Control', cacheControl)
 		response.json(data)
 
