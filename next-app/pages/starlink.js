@@ -23,19 +23,24 @@ export default class Starlink extends React.Component {
 		var date = new Date(startOfYear + dayMillis);
 		return date
 	}
+	static opacityFrom(s) {
+		let date = Starlink.dateFrom(s.year, s.day)
+		if ((Date.now() - date.getTime()) > 7 * (1000 * 60 * 60 * 24)) return 0
+		return 1
+	}
 
 
 	async getStarlinkData() {
 		try {
 
 			let colors = [
-				'rgba(255, 99, 132, 0.8)',
-				'rgba(54, 162, 235, 0.8)',
-				'rgba(255, 206, 86, 0.8)',
-				'rgba(75, 192, 192, 0.8)',
-				'rgba(255, 159, 64, 0.8)',
-				'rgba(153, 102, 255, 0.8)',
-				'rgba(160,160,160, 0.8)',
+				'255, 99, 132',
+				'54, 162, 235',
+				'255, 206, 86',
+				'75, 192, 192',
+				'255, 159, 64',
+				'153, 102, 255',
+				'160,160,160',
 			]
 
 			// https://us-central1-spacex-launches-318bc.cloudfunctions.net/starlinkApi
@@ -45,15 +50,15 @@ export default class Starlink extends React.Component {
 			satellites = satellites.map(s => ({...s, anomalyPastAscensingNode:(s.argumentOfPerigee + s.anomaly)%360 }))
 
 			let launches = satellites.map(s => s.launch).filter((v,i,a) => i == a.indexOf(v))
-			let datasets = launches.map((l,i) => {
+			let datasets = launches.map((l,li) => {
 				let launchSatellites = satellites.filter(s => s.launch == l)
 				let points = launchSatellites.map(s => ({ x:s.anomalyPastAscensingNode, y:s.longitudeAscendingNode }))
+				let cc = launchSatellites.map(s => 'rgba('+colors[li]+', '+Starlink.opacityFrom(s)+')')
 				return {
 					label: l,
 					pointRadius: 4,
-					color: colors[i],
-					backgroundColor: colors[i],
-					borderColor: 'rgba(0,0,0, 0.0)',
+					backgroundColor: cc,
+					borderColor: 'rgba('+colors[li]+', 1)',
 					pointBorderWidth: 0,
 					pointHoverRadius: 8,
 					data: points
