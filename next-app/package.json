@@ -5,13 +5,15 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-	 "start": "next start",
-	 "export": "next export"
+    "start": "next start",
+    "export": "next export"
   },
   "dependencies": {
     "axios": "^0.19.2",
+    "chart.js": "^2.9.3",
     "next": "9.4.2",
     "react": "16.13.1",
+    "react-chartjs-2": "^2.9.0",
     "react-dom": "16.13.1"
   }
 }

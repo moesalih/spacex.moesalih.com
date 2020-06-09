@@ -17,7 +17,15 @@
 				"function": "launchesCal"
 			},
 			{
-				"source": "**",
+				"source": "/starlink/api",
+				"function": "starlinkApi"
+			},
+			{
+				"source": "/starlink",
+				"destination": "/starlink.html"
+			},
+			{
+				"source": "/",
 				"destination": "/index.html"
 			}
 		]

@@ -16,6 +16,8 @@ const readFile_ = util.promisify(fs.readFile);
 let cacheControl = 'public, max-age=1800'
 
 
+exports.starlinkApi = require('./starlink').starlinkApi
+
 exports.launchesApi = functions.https.onRequest(async (request, response) => {
 	try {
 		let data = await getLaunches()

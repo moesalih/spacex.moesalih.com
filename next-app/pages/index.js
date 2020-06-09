@@ -1,5 +1,7 @@
 import React from "react";
 import Head from 'next/head'
+import Link from 'next/link'
+
 import axios from 'axios'
 
 export default class Index extends React.Component {
@@ -54,7 +56,10 @@ export default class Index extends React.Component {
 
 				<div class="container-lg my-4 my-lg-5">
 
-					<div class="float-right d-md-none h5"><a href="#info" class="text-muted text-decoration-none"><i class="feather icon-info"></i></a></div>
+				<div class="float-right mt-1">
+					{<Link href="/starlink"><a class="d-none d-md-inline-block">Starlink 🛰</a></Link>}
+					<a href="#info" class="d-md-none h5 text-muted text-decoration-none"><i class="feather icon-info"></i></a>
+				</div>
 
 					<h3 class="mb-5">SpaceX Launches 🚀</h3>
 
