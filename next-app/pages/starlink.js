@@ -206,14 +206,17 @@ export default class Starlink extends React.Component {
 							<Scatter data={this.state.chartData} options={this.state.chartOptions} width={100} height={100} />
 						}
 
-						<div class="small my-5">
-							<p class=""><strong>Anomaly past Ascending Node</strong> refers to the position of each satellite in its plane, and is the sum of <a href="https://en.wikipedia.org/wiki/Argument_of_periapsis" target="_blank">Argument of perigee</a> and <a href="https://en.wikipedia.org/wiki/Mean_anomaly" target="_blank">Mean anomoly</a>.</p>
-							<p class=""><a href="https://en.wikipedia.org/wiki/Longitude_of_the_ascending_node" target="_blank" class="font-weight-bold">Longitude of Ascending Node</a> refers to the orientation of each satellite's plane.</p>
-							<p class="">All Starlink satellites have the same inclination of 53°</p>
+						{this.state.chartData &&
+							<div class="small my-5">
+								<p>This chart show the current oribital parameters of each Starlink satellite launched so far. Please note that some satellites have different parameter timestamps so they might not line up exactly with others.</p>
+								<p><strong>Anomaly past Ascending Node</strong> refers to the position of each satellite in its plane, and is the sum of <a href="https://en.wikipedia.org/wiki/Argument_of_periapsis" target="_blank">Argument of perigee</a> and <a href="https://en.wikipedia.org/wiki/Mean_anomaly" target="_blank">Mean anomoly</a>.</p>
+								<p><a href="https://en.wikipedia.org/wiki/Longitude_of_the_ascending_node" target="_blank"><strong>Longitude of Ascending Node</strong></a> refers to the orientation of each satellite's plane.</p>
+								<p>All Starlink satellites have the same inclination of 53°</p>
 
-							<p class="">More info here: <a href="https://en.wikipedia.org/wiki/Orbital_elements" target="_blank">Orbital Elements (Wikipedia)</a></p>
+								<p>More info here: <a href="https://en.wikipedia.org/wiki/Orbital_elements" target="_blank">Orbital Elements (Wikipedia)</a></p>
 
-						</div>
+							</div>
+						}
 
 						{/*this.state.starlink && this.state.starlink.map((s,i) =>
 							<div key={i}>
