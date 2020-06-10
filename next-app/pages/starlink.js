@@ -35,11 +35,12 @@ export default class Starlink extends React.Component {
 		try {
 
 			let colors = [
+				'200,200,200',
 				'255, 99, 132',
 				'54, 162, 235',
 				'255, 206, 86',
-				'75, 192, 192',
 				'255, 159, 64',
+				'75, 192, 192',
 				'153, 102, 255',
 				'192, 192, 75',
 
@@ -48,7 +49,7 @@ export default class Starlink extends React.Component {
 
 			// https://us-central1-spacex-launches-318bc.cloudfunctions.net/starlinkApi
 			// https://spacex.moesalih.com/starlink/api
-			const response = await axios.get('https://us-central1-spacex-launches-318bc.cloudfunctions.net/starlinkApi')
+			const response = await axios.get('https://spacex.moesalih.com/starlink/api')
 			let satellites = response.data
 			satellites = satellites.map(s => ({...s, anomalyPastAscensingNode:(s.argumentOfPerigee + s.anomaly)%360 }))
 
