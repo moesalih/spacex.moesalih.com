@@ -26,7 +26,8 @@ export default class Starlink extends React.Component {
 	static opacityFrom(s) {
 		let date = Starlink.dateFrom(s.year, s.day)
 		if ((Date.now() - date.getTime()) > 7 * (1000 * 60 * 60 * 24)) return 0
-		return 1
+		let heightRatio = (s.info.height-300)/250
+		return heightRatio
 	}
 
 
@@ -57,10 +58,11 @@ export default class Starlink extends React.Component {
 				return {
 					label: l,
 					pointRadius: 4,
-					backgroundColor: cc,
+					pointBackgroundColor: cc,
+					backgroundColor: 'rgba('+colors[li]+', 1)',
 					borderColor: 'rgba('+colors[li]+', 1)',
 					pointBorderWidth: 0,
-					pointHoverRadius: 8,
+					pointHoverRadius: 6,
 					data: points
 				}
 			})
@@ -132,6 +134,7 @@ export default class Starlink extends React.Component {
 								'Mean Anomaly: ' + satellite.anomaly,
 								'Anomaly past Ascending Node: ' + satellite.anomalyPastAscensingNode,
 								'Longitude of Ascending Node: ' + satellite.longitudeAscendingNode,
+								'Altitude: ' + satellite.info.height,
 								'',
 								'Day: ' + satellite.day,
 								// 'Date: ' + Starlink.dateFrom(satellite.year, satellite.day),

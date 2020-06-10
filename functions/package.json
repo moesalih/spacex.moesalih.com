@@ -9,7 +9,7 @@
 		"logs": "firebase functions:log"
 	},
 	"engines": {
-		"node": "8"
+		"node": "10"
 	},
 	"dependencies": {
 		"axios": "^0.19.2",
@@ -19,7 +19,8 @@
 		"ical-generator": "^1.7.1",
 		"moment-timezone": "^0.5.23",
 		"mustache": "^3.0.1",
-		"request": "^2.88.2"
+		"request": "^2.88.2",
+		"tle.js": "^4.0.12"
 	},
 	"devDependencies": {
 		"firebase-functions-test": "^0.2.0"

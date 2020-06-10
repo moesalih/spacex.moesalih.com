@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 
 const axios = require('axios');
+const { getSatelliteInfo } = require("tle.js");
 
 
 
@@ -16,7 +17,7 @@ module.exports.starlinkApi = functions.https.onRequest(async (request, response)
 
 		response.header('Access-Control-Allow-Origin', '*')
 		response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
-		response.set('Cache-Control', 'public, max-age=300')
+		response.set('Cache-Control', 'public, max-age=1800')
 		response.json(data)
 
 	} catch(e) {
@@ -485,6 +486,7 @@ let parseTLE = (tle) => {
 			break
 
 			case '1': // info
+			currentSatellite._line1 = line
 			currentSatellite.designator = components[2]
 			currentSatellite.launch = 'Starlink-'+designatorToLaunchNumber(currentSatellite.designator)
 			let yearText = components[3].substring(0,2)
@@ -494,11 +496,20 @@ let parseTLE = (tle) => {
 			break
 
 			case '2': // data
+			currentSatellite._line2 = line
 			currentSatellite.id = components[1]
 			currentSatellite.inclination = parseFloat(components[2])
 			currentSatellite.longitudeAscendingNode = parseFloat(components[3])
 			currentSatellite.anomaly = parseFloat(components[6])
 			currentSatellite.argumentOfPerigee = parseFloat(components[5])
+
+			try {
+				currentSatellite.info = getSatelliteInfo([currentSatellite._line1,currentSatellite._line2])
+			} catch (e) {
+				currentSatellite.info = {}
+			}
+			delete currentSatellite._line1
+			delete currentSatellite._line2
 			satellites.push(currentSatellite)
 			currentSatellite = null
 			break
