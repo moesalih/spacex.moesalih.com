@@ -57,7 +57,7 @@ export default class Index extends React.Component {
 				<div class="container-lg my-4 my-lg-5">
 
 				<div class="float-right mt-1">
-					{<Link href="/starlink"><a class="d-none d-md-inline-block">Starlink 🛰</a></Link>}
+					<Link href="/starlink" ><a><span class="d-none d-md-inline-block">Starlink 🛰</span><span class="d-md-none h5 text-decoration-none mr-2">🛰</span></a></Link>
 					<a href="#info" class="d-md-none h5 text-muted text-decoration-none"><i class="feather icon-info"></i></a>
 				</div>
 
