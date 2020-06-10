@@ -204,6 +204,15 @@ export default class Starlink extends React.Component {
 							<Scatter data={this.state.chartData} options={this.state.chartOptions} width={100} height={100} />
 						}
 
+						<div class="my-5">
+							<p class=""><strong>Anomaly past Ascending Node</strong> refers to the position of each satellite in its plane, and is the sum of <a href="https://en.wikipedia.org/wiki/Argument_of_periapsis" target="_blank">Argument of perigee</a> and <a href="https://en.wikipedia.org/wiki/Mean_anomaly" target="_blank">Mean anomoly</a>.</p>
+							<p class=""><a href="https://en.wikipedia.org/wiki/Longitude_of_the_ascending_node" target="_blank" class="font-weight-bold">Longitude of Ascending Node</a> refers to the orientation of each satellite's plane.</p>
+							<p class="">All Starlink satellites have the same inclination of 53°</p>
+
+							<p class="">More info here: <a href="https://en.wikipedia.org/wiki/Orbital_elements" target="_blank">Orbital Elements (Wikipedia)</a></p>
+
+						</div>
+
 						{/*this.state.starlink && this.state.starlink.map((s,i) =>
 							<div key={i}>
 								<div class="font-weight-bold">{s.name}</div>
