@@ -1,10 +1,5 @@
 mark inactive
-altitude
 date?
-
-*publish*
-
 get list of satellites from sheet
-
 3d globe?
 time shift
