@@ -8,23 +8,16 @@ import {Scatter} from 'react-chartjs-2'
 
 export default class Starlink extends React.Component {
 
+	satellites = null
 
 	constructor(props) {
 		super(props)
 		this.state = { }
-		this.getStarlinkData = this.getStarlinkData.bind(this)
 		this.getStarlinkData()
-		// this.onGenerate = this.onGenerate.bind(this)
 	}
 
-	static dateFrom(y, d) {
-		let startOfYear = Date.UTC(y, 0)
-		var dayMillis = d * (1000 * 60 * 60 * 24)
-		var date = new Date(startOfYear + dayMillis);
-		return date
-	}
 	static opacityFrom(s) {
-		let date = Starlink.dateFrom(s.year, s.day)
+		let date = new Date(s.timestamp)
 		if ((Date.now() - date.getTime()) > 7 * (1000 * 60 * 60 * 24)) return 0
 		let heightRatio = (s.info.height-300)/250
 		return heightRatio
@@ -34,127 +27,146 @@ export default class Starlink extends React.Component {
 	async getStarlinkData() {
 		try {
 
-			let colors = [
-				'200,200,200',
-				'255, 99, 132',
-				'54, 162, 235',
-				'255, 206, 86',
-				'255, 159, 64',
-				'75, 192, 192',
-				'153, 102, 255',
-				'192, 192, 75',
+			let RAANchangePerSec = -5.19575e-05
 
-				'160,160,160',
-			]
-
-			// https://us-central1-spacex-launches-318bc.cloudfunctions.net/starlinkApi
-			// https://spacex.moesalih.com/starlink/api
 			const response = await axios.get('https://spacex.moesalih.com/starlink/api')
-			let satellites = response.data
-			satellites = satellites.map(s => ({...s, anomalyPastAscensingNode:(s.argumentOfPerigee + s.anomaly)%360 }))
-
-			let launches = satellites.map(s => s.launch).filter((v,i,a) => i == a.indexOf(v))
-			let datasets = launches.map((l,li) => {
-				let launchSatellites = satellites.filter(s => s.launch == l)
-				let points = launchSatellites.map(s => ({ x:s.anomalyPastAscensingNode, y:s.longitudeAscendingNode }))
-				let cc = launchSatellites.map(s => 'rgba('+colors[li]+', '+Starlink.opacityFrom(s)+')')
+			this.satellites = response.data
+			this.satellites = this.satellites.map(s => {
+				let secondsInPast = (new Date().getTime() - s.timestamp) / 1000
+				let degPerSec = 360 * s.motion / (24*3600)
 				return {
-					label: l,
-					pointRadius: 4,
-					pointBackgroundColor: cc,
-					backgroundColor: 'rgba('+colors[li]+', 1)',
-					borderColor: 'rgba('+colors[li]+', 1)',
-					pointBorderWidth: 0,
-					pointHoverRadius: 6,
-					data: points
+					...s,
+					anomalyPastAscensingNode: (s.argumentOfPerigee + s.anomaly) % 360,
+
+					currentAnomalyPastAscensingNode: (s.argumentOfPerigee + s.anomaly + degPerSec*secondsInPast) % 360,
+					currentLongitudeAscendingNode: (s.longitudeAscendingNode + RAANchangePerSec*secondsInPast) % 360,
 				}
 			})
-			// console.log(satellites, launches)
+			console.log(this.satellites)
 
-			let chartData = {
-				datasets: datasets
-			}
+			this.updateChart()
 
-			let chartOptions = {
-				animation: false,
-				// legend: {
-				// 	display: false
-				// },
-				legend: {
-					labels: {
-						boxWidth: 20,
-					},
-				},
-				scales: {
-					xAxes: [{
-						scaleLabel: {
-							labelString: 'Anomaly past Ascending Node',
-							display: true,
-							fontColor: '#999',
-						},
-						ticks: {
-							max: 360,
-							min: 0,
-							stepSize: 20,
-							fontSize: 10,
-						}
-					}],
-					yAxes: [{
-						scaleLabel: {
-							labelString: 'Longitude of Ascending Node',
-							display: true,
-							fontColor: '#999',
-						},
-						ticks: {
-							max: 360,
-							min: 0,
-							stepSize: 20,
-							fontSize: 10,
-						},
-					}]
-				},
-				tooltips: {
-					displayColors: false,
-					callbacks: {
-						title: function(tooltipItems, data) {
-							let tooltipItem = tooltipItems[0]
-							let launch = launches[tooltipItem.datasetIndex]
-							let launchSatellites = satellites.filter(s => s.launch == launch)
-							let satellite = launchSatellites[tooltipItem.index]
-							return satellite.name
-						},
-						label: function(tooltipItem, data) {
-							let launch = launches[tooltipItem.datasetIndex]
-							let launchSatellites = satellites.filter(s => s.launch == launch)
-							let satellite = launchSatellites[tooltipItem.index]
-
-
-							let label = [
-								'Launch: ' + satellite.launch,
-								'Designator: ' + satellite.designator,
-								'',
-								'Argument of Perigee: ' + satellite.argumentOfPerigee,
-								'Mean Anomaly: ' + satellite.anomaly,
-								'Anomaly past Ascending Node: ' + satellite.anomalyPastAscensingNode,
-								'Longitude of Ascending Node: ' + satellite.longitudeAscendingNode,
-								'Altitude: ' + satellite.info.height,
-								'',
-								'Day: ' + satellite.day,
-								// 'Date: ' + Starlink.dateFrom(satellite.year, satellite.day),
-							]
-
-							return label
-						},
-					}
-				}
-
-			}
-
-			// console.log(response.data)
-			this.setState({ chartData:chartData, chartOptions:chartOptions })
 		} catch (error) {
 			console.error(error)
 		}
+	}
+
+	updateChart = () => {
+
+		let colors = [
+			'200,200,200',
+			'255, 99, 132',
+			'54, 162, 235',
+			'255, 206, 86',
+			'255, 159, 64',
+			'75, 192, 192',
+			'153, 102, 255',
+			'192, 192, 75',
+
+			'160,160,160',
+		]
+
+		let launches = this.satellites.map(s => s.launch).filter((v,i,a) => i == a.indexOf(v))
+		let datasets = launches.map((l,li) => {
+			let launchSatellites = this.satellites.filter(s => s.launch == l)
+			let points = launchSatellites.map(s => ({ x:s.currentAnomalyPastAscensingNode, y:s.currentLongitudeAscendingNode }))
+			let cc = launchSatellites.map(s => 'rgba('+colors[li]+', '+Starlink.opacityFrom(s)+')')
+			return {
+				label: l,
+				pointRadius: 4,
+				pointBackgroundColor: cc,
+				backgroundColor: 'rgba('+colors[li]+', 1)',
+				borderColor: 'rgba('+colors[li]+', 0.25)',
+				pointBorderWidth: 0,
+				pointHoverRadius: 6,
+				data: points
+			}
+		})
+		// console.log(satellites, launches)
+
+		let chartData = {
+			datasets: datasets
+		}
+
+		let chartOptions = {
+			animation: false,
+			// legend: {
+			// 	display: false
+			// },
+			legend: {
+				labels: {
+					boxWidth: 20,
+				},
+			},
+			scales: {
+				xAxes: [{
+					scaleLabel: {
+						labelString: 'Anomaly past Ascending Node',
+						display: true,
+						fontColor: '#999',
+					},
+					ticks: {
+						max: 360,
+						min: 0,
+						stepSize: 20,
+						fontSize: 10,
+					}
+				}],
+				yAxes: [{
+					scaleLabel: {
+						labelString: 'Longitude of Ascending Node',
+						display: true,
+						fontColor: '#999',
+					},
+					ticks: {
+						max: 360,
+						min: 0,
+						stepSize: 20,
+						fontSize: 10,
+					},
+				}]
+			},
+			tooltips: {
+				displayColors: false,
+				callbacks: {
+					title: (tooltipItems, data) => {
+						let tooltipItem = tooltipItems[0]
+						let launch = launches[tooltipItem.datasetIndex]
+						let launchSatellites = this.satellites.filter(s => s.launch == launch)
+						let satellite = launchSatellites[tooltipItem.index]
+						return satellite.name
+					},
+					label: (tooltipItem, data) => {
+						let launch = launches[tooltipItem.datasetIndex]
+						let launchSatellites = this.satellites.filter(s => s.launch == launch)
+						let satellite = launchSatellites[tooltipItem.index]
+
+
+						let label = [
+							'Launch: ' + satellite.launch,
+							'Designator: ' + satellite.designator,
+							'',
+							'Argument of Perigee: ' + satellite.argumentOfPerigee,
+							'Mean Anomaly: ' + satellite.anomaly,
+							'Anomaly past Ascending Node: ' + satellite.anomalyPastAscensingNode,
+							'Longitude of Ascending Node: ' + satellite.longitudeAscendingNode,
+							'Altitude: ' + satellite.info.height,
+							'',
+							'Timestamp: ' + new Date(satellite.timestamp),
+							'',
+							'Current Anomaly past Ascending Node: ' + satellite.currentAnomalyPastAscensingNode,
+							'Current Longitude of Ascending Node: ' + satellite.currentLongitudeAscendingNode,
+						]
+
+						return label
+					},
+				}
+			}
+
+		}
+
+		// console.log(response.data)
+		this.setState({ chartData:chartData, chartOptions:chartOptions })
 	}
 
 	render() {
