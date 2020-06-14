@@ -1,5 +1,3 @@
-mark inactive
-date?
 get list of satellites from sheet
+mark inactive
 3d globe?
-time shift

@@ -8,12 +8,18 @@ import {Scatter} from 'react-chartjs-2'
 
 export default class Starlink extends React.Component {
 
+	originalSatellitesData = null
 	satellites = null
+	timer = null
 
 	constructor(props) {
 		super(props)
 		this.state = { }
 		this.getStarlinkData()
+	}
+
+	componentWillUnmount() {
+		clearTimeout(this.timer)
 	}
 
 	static opacityFrom(s) {
@@ -26,29 +32,33 @@ export default class Starlink extends React.Component {
 
 	async getStarlinkData() {
 		try {
-
-			let RAANchangePerSec = -5.19575e-05
-
 			const response = await axios.get('https://spacex.moesalih.com/starlink/api')
-			this.satellites = response.data
-			this.satellites = this.satellites.map(s => {
-				let secondsInPast = (new Date().getTime() - s.timestamp) / 1000
-				let degPerSec = 360 * s.motion / (24*3600)
-				return {
-					...s,
-					anomalyPastAscensingNode: (s.argumentOfPerigee + s.anomaly) % 360,
-
-					currentAnomalyPastAscensingNode: (s.argumentOfPerigee + s.anomaly + degPerSec*secondsInPast) % 360,
-					currentLongitudeAscendingNode: (s.longitudeAscendingNode + RAANchangePerSec*secondsInPast) % 360,
-				}
-			})
-			console.log(this.satellites)
-
-			this.updateChart()
-
+			this.originalSatellitesData = response.data
+			this.calculateCurrentData()
 		} catch (error) {
 			console.error(error)
 		}
+	}
+
+	calculateCurrentData = () => {
+		console.log(this)
+		let RAANchangePerSec = -5.19575e-05
+
+		this.satellites = this.originalSatellitesData.map(s => {
+			let secondsInPast = (new Date().getTime() - s.timestamp) / 1000
+			let degPerSec = 360 * s.motion / (24*3600)
+			return {
+				...s,
+				anomalyPastAscensingNode: (s.argumentOfPerigee + s.anomaly) % 360,
+
+				currentAnomalyPastAscensingNode: (s.argumentOfPerigee + s.anomaly + degPerSec*secondsInPast) % 360,
+				currentLongitudeAscendingNode: (s.longitudeAscendingNode + RAANchangePerSec*secondsInPast) % 360,
+			}
+		})
+		// console.log(this.satellites)
+
+		this.updateChart()
+		this.timer = window.setTimeout(this.calculateCurrentData, 10000)
 	}
 
 	updateChart = () => {
@@ -221,7 +231,7 @@ export default class Starlink extends React.Component {
 
 						{this.state.chartData &&
 							<div class="small my-5">
-								<p>This chart show the current oribital parameters of each Starlink satellite launched so far. Please note that some satellites have different parameter timestamps so they might not line up exactly with others.</p>
+								<p>This chart show the current oribital parameters of each Starlink satellite launched so far.</p>
 								<p><strong>Anomaly past Ascending Node</strong> refers to the position of each satellite in its plane, and is the sum of <a href="https://en.wikipedia.org/wiki/Argument_of_periapsis" target="_blank">Argument of perigee</a> and <a href="https://en.wikipedia.org/wiki/Mean_anomaly" target="_blank">Mean anomoly</a>.</p>
 								<p><a href="https://en.wikipedia.org/wiki/Longitude_of_the_ascending_node" target="_blank"><strong>Longitude of Ascending Node</strong></a> refers to the orientation of each satellite's plane.</p>
 								<p>Altitude is represented by the opacity of each point (300 - 550 KM)</p>
