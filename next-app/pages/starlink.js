@@ -51,11 +51,11 @@ export default class Starlink extends React.Component {
 				...s,
 				anomalyPastAscensingNode: (s.argumentOfPerigee + s.anomaly) % 360,
 
-				currentAnomalyPastAscensingNode: (s.argumentOfPerigee + s.anomaly + degPerSec*secondsInPast) % 360,
-				currentLongitudeAscendingNode: (s.longitudeAscendingNode + RAANchangePerSec*secondsInPast) % 360,
+				currentAnomalyPastAscensingNode: (s.argumentOfPerigee + s.anomaly + degPerSec*secondsInPast + 360) % 360,
+				currentLongitudeAscendingNode: (s.longitudeAscendingNode + RAANchangePerSec*secondsInPast + 360) % 360,
 			}
 		})
-		// console.log(this.satellites)
+		console.log(this.satellites)
 
 		this.updateChart()
 		this.timer = window.setTimeout(this.calculateCurrentData, 10000)
@@ -72,7 +72,13 @@ export default class Starlink extends React.Component {
 			'75, 192, 192',
 			'153, 102, 255',
 			'192, 192, 75',
+			'100, 120, 200',
 
+			'160,160,160',
+			'160,160,160',
+			'160,160,160',
+			'160,160,160',
+			'160,160,160',
 			'160,160,160',
 		]
 

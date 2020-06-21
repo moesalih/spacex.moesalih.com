@@ -107,7 +107,7 @@ let parseTLE = (tle) => {
 }
 
 let designatorToLaunchNumber = (designator) => {
-	let launches = ['19029', '19074', '20001', '20006', '20012', '20019', '20025', '20035']
+	let launches = ['19029', '19074', '20001', '20006', '20012', '20019', '20025', '20035', '20038']
 	for (var l of launches) {
 		if (designator.includes(l)) return launches.indexOf(l)
 	}
