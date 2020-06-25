@@ -1,0 +1,22 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "dev",
+			"path": "next-app/",
+			"problemMatcher": [],
+			"label": "start next-app",
+		},
+		{
+			"type": "shell",
+			"command": "firebase deploy --only functions",
+			"label": "🔥👍 functions",
+		},
+		{
+			"type": "shell",
+			"command": "firebase deploy --only hosting",
+			"label": "🔥👍 hosting",
+		},
+	]
+}

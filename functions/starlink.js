@@ -65,7 +65,7 @@ let parseTLE = (tle) => {
 			break
 
 			case '1': // info
-			currentSatellite._line1 = line
+			currentSatellite.tle1 = line
 			currentSatellite.designator = components[2]
 			currentSatellite.launch = 'Starlink-'+designatorToLaunchNumber(currentSatellite.designator)
 			let yearText = components[3].substring(0,2)
@@ -75,7 +75,7 @@ let parseTLE = (tle) => {
 			break
 
 			case '2': // data
-			currentSatellite._line2 = line
+			currentSatellite.tle2 = line
 			currentSatellite.id = components[1]
 			currentSatellite.inclination = parseFloat(components[2])
 			currentSatellite.longitudeAscendingNode = parseFloat(components[3])
@@ -84,15 +84,13 @@ let parseTLE = (tle) => {
 			currentSatellite.motion = parseFloat(components[7])
 
 			try {
-				let tle = [currentSatellite._line1,currentSatellite._line2]
+				let tle = [currentSatellite.tle1,currentSatellite.tle2]
 				currentSatellite.timestamp = getEpochTimestamp(tle)
 				currentSatellite.info = getSatelliteInfo(tle)
 			} catch (e) {
 				console.log(e);
 				currentSatellite.info = {}
 			}
-			delete currentSatellite._line1
-			delete currentSatellite._line2
 			satellites.push(currentSatellite)
 			currentSatellite = null
 			break
