@@ -51,7 +51,7 @@ export default class Starlink extends React.Component {
 	static opacityFrom(s) {
 		let date = new Date(s.timestamp)
 		if ((Date.now() - date.getTime()) > 7 * (1000 * 60 * 60 * 24)) return 0
-		let heightRatio = (s.info.height - 300) / 250
+		let heightRatio = (s.currentInfo.height - 300) / 250
 		return heightRatio
 	}
 
@@ -181,16 +181,9 @@ export default class Starlink extends React.Component {
 							'Launch: ' + satellite.launch,
 							'Designator: ' + satellite.designator,
 							'',
-							'Argument of Perigee: ' + satellite.argumentOfPerigee,
-							'Mean Anomaly: ' + satellite.anomaly,
-							'Anomaly past Ascending Node: ' + satellite.anomalyPastAscensingNode,
-							'Longitude of Ascending Node: ' + satellite.longitudeAscendingNode,
-							'',
-							'Timestamp: ' + new Date(satellite.timestamp),
-							'',
-							'Current Anomaly past Ascending Node: ' + satellite.currentAnomalyPastAscensingNode,
-							'Current Longitude of Ascending Node: ' + satellite.currentLongitudeAscendingNode,
-							'Current Altitude: ' + satellite.currentInfo.height,
+							'Anomaly past Ascending Node: ' + satellite.currentAnomalyPastAscensingNode,
+							'Longitude of Ascending Node: ' + satellite.currentLongitudeAscendingNode,
+							'Altitude: ' + satellite.currentInfo.height,
 						]
 
 						return label
