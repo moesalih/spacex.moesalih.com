@@ -19,7 +19,6 @@
 		"ical-generator": "^1.7.1",
 		"moment-timezone": "^0.5.23",
 		"mustache": "^3.0.1",
-		"request": "^2.88.2",
 		"tle.js": "^4.0.12"
 	},
 	"devDependencies": {

@@ -35,7 +35,7 @@ let getStarlinkData = async () => {
 
 	let satelliteIds = require('fs').readFileSync('starlink-satellites.txt', 'utf8')
 	satelliteIds = satelliteIds.split('\n').map(l => l.trim()).filter(l => !!l).join(',')
-	console.log(satelliteIds);
+	// console.log(satelliteIds);
 
 	let dataResponse = await axios.get('https://www.space-track.org/basicspacedata/query/class/tle_latest/ORDINAL/1/NORAD_CAT_ID/'+satelliteIds+'/orderby/TLE_LINE1 ASC/format/3le', {
 		headers: { 'Cookie': cookie }
@@ -88,7 +88,7 @@ let parseTLE = (tle) => {
 				currentSatellite.timestamp = getEpochTimestamp(tle)
 				currentSatellite.info = getSatelliteInfo(tle)
 			} catch (e) {
-				console.log(e);
+				// console.log(e);
 				currentSatellite.info = {}
 			}
 			satellites.push(currentSatellite)

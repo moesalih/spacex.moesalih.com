@@ -2,18 +2,25 @@ const functions = require('firebase-functions');
 
 const fs = require('fs')
 const util = require('util')
-const request = require('request')
+const axios = require('axios');
 const cheerio = require('cheerio')
 const mustache = require('mustache')
 const moment = require('moment-timezone')
 const ical = require('ical-generator')
 
-const get_ = util.promisify(request.get)
 const readFile_ = util.promisify(fs.readFile);
 
 
 
 let cacheControl = 'public, max-age=1800'
+
+
+
+exports.scheduledCache = functions.pubsub.schedule('every 30 minutes').onRun(async (context) => {
+	await axios.get('https://spacex.moesalih.com/api')
+	await axios.get('https://spacex.moesalih.com/starlink/api')
+	return null
+})
 
 
 exports.starlinkApi = require('./starlink').starlinkApi
@@ -28,7 +35,7 @@ exports.launchesApi = functions.https.onRequest(async (request, response) => {
 		response.set('Cache-Control', cacheControl)
 		response.json(data)
 
-	} catch(e) {
+	} catch (e) {
 		response.json({ error: e })
 	}
 })
@@ -44,7 +51,7 @@ exports.launches = functions.https.onRequest(async (request, response) => {
 		response.set('Cache-Control', cacheControl)
 		response.send(mustache.render(template, data));
 
-	} catch(e) {
+	} catch (e) {
 		response.json({ error: e });
 	}
 })
@@ -70,14 +77,14 @@ exports.launchesCal = functions.https.onRequest(async (request, response) => {
 				description: launch.note,
 				organizer: 'SpaceX <hello@spacex.com>'
 			})
-			const alarm = event.createAlarm({type: 'audio', trigger: 1800});
+			const alarm = event.createAlarm({ type: 'audio', trigger: 1800 });
 		}
 
 		response.contentType('text/calendar; charset=utf-8')
 		response.set('Cache-Control', cacheControl)
 		response.send(cal.toString());
 
-	} catch(e) {
+	} catch (e) {
 		console.log(e);
 		response.json({ error: e.message });
 	}
@@ -88,16 +95,16 @@ exports.launchesCal = functions.https.onRequest(async (request, response) => {
 async function getLaunches() {
 	try {
 
-		let { statusCode, body } = await get_({ url: 'https://en.wikipedia.org/wiki/List_of_Falcon_9_and_Falcon_Heavy_launches', timeout: 5000 })
-		if (!body) { throw null }
+		let response = await axios({ url: 'https://en.wikipedia.org/wiki/List_of_Falcon_9_and_Falcon_Heavy_launches', timeout: 5000 })
+		if (!response.data) { throw null }
 
-		var $ = cheerio.load(body)
+		var $ = cheerio.load(response.data)
 		var futureLaunchesH2 = $("#Future_launches").parent()
 
 		var table = futureLaunchesH2.nextAll('table')
 
 		var rows = table.find("tr")
-		rows = rows.filter(function(i, el) {
+		rows = rows.filter(function (i, el) {
 			if ($(this).find("th").length > 0) return false // hide header
 			if ($(this).find("td").first().attr("colspan") == 6) return false // hide year rows
 			return true
@@ -107,7 +114,7 @@ async function getLaunches() {
 			launches: []
 		}
 		var launch = {}
-		rows.each(function(i, el) {
+		rows.each(function (i, el) {
 			var children = $(this).children()
 			// console.log(children.length)
 			if (children.first().attr("rowspan")) {
@@ -141,7 +148,7 @@ async function getLaunches() {
 		// console.log(data)
 		return data
 
-	} catch(e) {
+	} catch (e) {
 		console.error(e);
 		return null
 	}
