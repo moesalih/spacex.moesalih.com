@@ -2,6 +2,7 @@ import React from "react"
 import Head from 'next/head'
 import Link from 'next/link'
 import axios from 'axios'
+import moment from 'moment'
 
 import { GoogleMap, LoadScript, Circle } from '@react-google-maps/api';
 import { Scatter } from 'react-chartjs-2'
@@ -60,19 +61,37 @@ export default class Starlink extends React.Component {
 		try {
 			const response = await axios.get('https://spacex.moesalih.com/starlink/api')
 			this.originalSatellitesData = response.data
-			this.calculateCurrentData()
+			this.calculatePastData()
 		} catch (error) {
 			console.error(error)
 		}
 	}
 
 	calculateCurrentData = () => {
-		console.log(this)
+		this.calculateDataAtTimestamp(new Date().getTime())
+		this.timer = setTimeout(this.calculateCurrentData, 10000)
+	}
+
+	calculatePastData = (t) => {
+		let timestamp = t || new Date().getTime() - 1000 * 60 * 92
+		this.calculateDataAtTimestamp(timestamp)
+		this.timer = setTimeout(() => {
+			timestamp += 1000 * 12
+			if (timestamp < new Date().getTime()) {
+				this.calculatePastData(timestamp)
+			} else {
+				this.calculateCurrentData()
+			}
+		}, 100)
+	}
+
+	calculateDataAtTimestamp = (timestamp) => {
+		// console.log(this)
 		let RAANchangePerSec = -5.19575e-05
 
 		let launches = this.originalSatellitesData.map(s => s.launch).filter((v, i, a) => i == a.indexOf(v))
 		this.satellites = this.originalSatellitesData.map(s => {
-			let secondsInPast = (new Date().getTime() - s.timestamp) / 1000
+			let secondsInPast = (timestamp - s.timestamp) / 1000
 			let degPerSec = 360 * s.motion / (24 * 3600)
 
 			let data = {
@@ -85,18 +104,17 @@ export default class Starlink extends React.Component {
 			}
 			try {
 				let tle = [s.tle1, s.tle2]
-				data.currentInfo = getSatelliteInfo(tle)
+				data.currentInfo = getSatelliteInfo(tle, timestamp)
 			} catch (e) {
 				data.currentInfo = {}
 			}
 
 			return data
 		})
-		console.log(this.satellites)
+		// console.log(this.satellites)
 
-		this.setState({ satellites: this.satellites })
+		this.setState({ satellites: this.satellites, timestamp: timestamp })
 		this.updateChart()
-		this.timer = window.setTimeout(this.calculateCurrentData, 10000)
 	}
 
 	updateChart = () => {
@@ -412,7 +430,13 @@ export default class Starlink extends React.Component {
 							}
 
 							{this.state.chartData &&
-								<div class="mb-4 embed-responsive embed-responsive-16by9">
+								<div class="mb-1 text-black-50 small">
+									Animation shows most recent orbit (92 mins)
+								</div>
+							}
+
+							{this.state.chartData &&
+								<div class="mb-2 embed-responsive embed-responsive-16by9">
 									<div class="embed-responsive-item">
 										<LoadScript googleMapsApiKey={googleMapsApiKey} >
 											<GoogleMap
@@ -424,13 +448,19 @@ export default class Starlink extends React.Component {
 												{this.state.satellites.filter(s => !!s.currentInfo.lat).map(s =>
 													<Circle
 														center={{ lat: s.currentInfo.lat, lng: s.currentInfo.lng }}
-														radius={60000} 
-														options={{ fillOpacity: 1, fillColor: 'rgba(' + s.color + ',' +  Starlink.opacityFrom(s) +')', strokeColor: 'rgba(' + s.color + ',' +  Starlink.opacityFrom(s) +')', strokeWidth: 1 }} 
+														radius={60000}
+														options={{ fillOpacity: 1, fillColor: 'rgba(' + s.color + ',' + Starlink.opacityFrom(s) + ')', strokeColor: 'rgba(' + s.color + ',' + Starlink.opacityFrom(s) + ')', strokeWidth: 1 }}
 														key={s.id} />
 												)}
 											</GoogleMap>
 										</LoadScript>
 									</div>
+								</div>
+							}
+
+							{this.state.chartData &&
+								<div class="text-center text-black-50 small">
+									<div className=" text-monospace small">{moment(this.state.timestamp).format('YYYY-MM-DD HH:mm:ss')}</div>
 								</div>
 							}
 
