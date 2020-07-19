@@ -61,18 +61,20 @@ export default class Starlink extends React.Component {
 		try {
 			const response = await axios.get('https://spacex.moesalih.com/starlink/api')
 			this.originalSatellitesData = response.data
-			this.calculatePastData()
+			this.calculateCurrentData()
 		} catch (error) {
 			console.error(error)
 		}
 	}
 
 	calculateCurrentData = () => {
+		clearTimeout(this.timer)
 		this.calculateDataAtTimestamp(new Date().getTime())
 		this.timer = setTimeout(this.calculateCurrentData, 10000)
 	}
 
 	calculatePastData = (t) => {
+		clearTimeout(this.timer)
 		let timestamp = t || new Date().getTime() - 1000 * 60 * 92
 		this.calculateDataAtTimestamp(timestamp)
 		this.timer = setTimeout(() => {
@@ -86,7 +88,7 @@ export default class Starlink extends React.Component {
 	}
 
 	calculateDataAtTimestamp = (timestamp) => {
-		// console.log(this)
+		// console.log(timestamp/1000)
 		let RAANchangePerSec = -5.19575e-05
 
 		let launches = this.originalSatellitesData.map(s => s.launch).filter((v, i, a) => i == a.indexOf(v))
@@ -113,7 +115,7 @@ export default class Starlink extends React.Component {
 		})
 		// console.log(this.satellites)
 
-		this.setState({ satellites: this.satellites, timestamp: timestamp })
+		this.setState({ satellites: this.satellites, timestamp: timestamp, isPast: timestamp < (new Date().getTime() - 1000 * 10) })
 		this.updateChart()
 	}
 
@@ -429,9 +431,15 @@ export default class Starlink extends React.Component {
 								<div class="text-center my-5 text-black-50"><div class="spinner-border" role="status"></div></div>
 							}
 
-							{this.state.chartData &&
+							{this.state.chartData && this.state.isPast &&
 								<div class="mb-1 text-black-50 small">
-									Animation shows most recent orbit (92 mins)
+									<span className="mr-2">Animation shows most recent orbit (92 mins)</span>
+									<a href="" onClick={(e) => { e.preventDefault(); this.calculateCurrentData() }}>Stop</a>
+								</div>
+							}
+							{this.state.chartData && !this.state.isPast &&
+								<div class="mb-1  small">
+									<a href="" onClick={(e) => { e.preventDefault(); this.calculatePastData() }}>Animate most recent orbit</a>
 								</div>
 							}
 
