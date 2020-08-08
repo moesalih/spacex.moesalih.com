@@ -102,7 +102,7 @@ export default class Starlink extends React.Component {
 				anomalyPastAscensingNode: (s.argumentOfPerigee + s.anomaly) % 360,
 
 				currentAnomalyPastAscensingNode: (s.argumentOfPerigee + s.anomaly + degPerSec * secondsInPast + 360) % 360,
-				currentLongitudeAscendingNode: (s.longitudeAscendingNode + RAANchangePerSec * secondsInPast + 360) % 360,
+				currentLongitudeAscendingNode: (s.longitudeAscendingNode + RAANchangePerSec * secondsInPast + 360 + 180) % 360 - 180,
 			}
 			try {
 				let tle = [s.tle1, s.tle2]
@@ -124,11 +124,11 @@ export default class Starlink extends React.Component {
 		let launches = this.satellites.map(s => s.launch).filter((v, i, a) => i == a.indexOf(v))
 		let datasets = launches.map((l, li) => {
 			let launchSatellites = this.satellites.filter(s => s.launch == l)
-			let points = launchSatellites.map(s => ({ x: s.currentAnomalyPastAscensingNode, y: s.currentLongitudeAscendingNode }))
+			let points = launchSatellites.map(s => ({ y: s.currentAnomalyPastAscensingNode, x: s.currentLongitudeAscendingNode }))
 			let cc = launchSatellites.map(s => 'rgba(' + s.color + ', ' + Starlink.opacityFrom(s) + ')')
 			return {
 				label: l,
-				pointRadius: 4,
+				pointRadius: 3,
 				pointBackgroundColor: cc,
 				backgroundColor: 'rgba(' + colors[li] + ', 1)',
 				borderColor: 'rgba(' + colors[li] + ', 0.25)',
@@ -144,6 +144,7 @@ export default class Starlink extends React.Component {
 		}
 
 		let chartOptions = {
+			maintainAspectRatio: false,
 			animation: false,
 			// legend: {
 			// 	display: false
@@ -154,7 +155,7 @@ export default class Starlink extends React.Component {
 				},
 			},
 			scales: {
-				xAxes: [{
+				yAxes: [{
 					scaleLabel: {
 						labelString: 'Anomaly past Ascending Node',
 						display: true,
@@ -167,15 +168,15 @@ export default class Starlink extends React.Component {
 						fontSize: 10,
 					}
 				}],
-				yAxes: [{
+				xAxes: [{
 					scaleLabel: {
 						labelString: 'Longitude of Ascending Node',
 						display: true,
 						fontColor: '#999',
 					},
 					ticks: {
-						max: 360,
-						min: 0,
+						max: 180,
+						min: -180,
 						stepSize: 20,
 						fontSize: 10,
 					},
@@ -409,6 +410,9 @@ export default class Starlink extends React.Component {
 
 					<style media="screen">{`
 						.feather { font-size: inherit }
+						@media (max-width: 575px) {
+							.embed-responsive-narrowsquare::before { padding-top: 100%; }
+						}
 					`}</style>
 
 				</Head>
@@ -473,7 +477,11 @@ export default class Starlink extends React.Component {
 							}
 
 							{this.state.chartData &&
-								<Scatter data={this.state.chartData} options={this.state.chartOptions} width={100} height={100} />
+								<div class="mb-2 embed-responsive embed-responsive-16by9 embed-responsive-narrowsquare">
+									<div class="embed-responsive-item">
+										<Scatter data={this.state.chartData} options={this.state.chartOptions} />
+									</div>
+								</div>
 							}
 
 							{this.state.chartData &&
