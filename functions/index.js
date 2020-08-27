@@ -115,6 +115,7 @@ async function getLaunches() {
 		}
 		var launch = {}
 		rows.each(function (i, el) {
+			$(this).find('br').replaceWith(' ')
 			var children = $(this).children()
 			// console.log(children.length)
 			if (children.first().attr("rowspan")) {
