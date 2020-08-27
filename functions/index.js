@@ -72,7 +72,7 @@ exports.launchesCal = functions.https.onRequest(async (request, response) => {
 				start: moment.tz(launch.date, timezone),
 				end: moment.tz(launch.date, timezone).add(1, 'hour'),
 				timezone: timezone,
-				summary: launch.payload + ' • ' + launch.customer,
+				summary: '🚀 ' + (launch.payloadIcon ? launch.payloadIcon + ' ' : '') + launch.payload + ' • ' + launch.customer,
 				location: launch.type + ' • ' + launch.site + ' • ' + launch.orbit,
 				description: launch.note,
 				organizer: 'SpaceX <hello@spacex.com>'
