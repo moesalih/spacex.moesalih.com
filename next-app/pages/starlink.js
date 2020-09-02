@@ -70,6 +70,15 @@ export default class Starlink extends React.Component {
 		}
 	}
 
+	getLaunches(satellites) {
+		let launches = satellites.map(s => s.launch).filter((v, i, a) => i == a.indexOf(v))
+		if (launches.includes('Starlink-X')) {
+			launches = launches.filter(l => l != 'Starlink-X')
+			launches.push('Starlink-X')
+		}
+		return launches
+	}
+
 	calculateCurrentData = () => {
 		clearTimeout(this.timer)
 		this.calculateDataAtTimestamp(new Date().getTime())
@@ -94,7 +103,7 @@ export default class Starlink extends React.Component {
 		// console.log(timestamp/1000)
 		let RAANchangePerSec = -5.19575e-05
 
-		let launches = this.originalSatellitesData.map(s => s.launch).filter((v, i, a) => i == a.indexOf(v))
+		let launches = this.getLaunches(this.originalSatellitesData)
 		this.satellites = this.originalSatellitesData.map(s => {
 			let secondsInPast = (timestamp - s.timestamp) / 1000
 			let degPerSec = 360 * s.motion / (24 * 3600)
@@ -124,7 +133,7 @@ export default class Starlink extends React.Component {
 
 	updateChart = () => {
 
-		let launches = this.satellites.map(s => s.launch).filter((v, i, a) => i == a.indexOf(v))
+		let launches = this.getLaunches(this.satellites)
 		let datasets = launches.map((l, li) => {
 			let launchSatellites = this.satellites.filter(s => s.launch == l)
 			let points = launchSatellites.map(s => ({ y: s.currentAnomalyPastAscensingNode, x: s.currentLongitudeAscendingNode }))
