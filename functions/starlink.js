@@ -26,6 +26,8 @@ module.exports.starlinkApi = functions.https.onRequest(async (request, response)
 })
 
 
+let array_chunks = (array, chunk_size) => Array(Math.ceil(array.length / chunk_size)).fill(0).map((_, index) => index * chunk_size).map(begin => array.slice(begin, begin + chunk_size));
+
 let getStarlinkData = async () => {
 	let loginReposnse = await axios.post('https://www.space-track.org/ajaxauth/login', {
 		identity: functions.config().spacetrack.email,
@@ -34,15 +36,29 @@ let getStarlinkData = async () => {
 	let cookie = loginReposnse.headers['set-cookie'][0]
 
 	let satelliteIds = require('fs').readFileSync('starlink-satellites.txt', 'utf8')
-	satelliteIds = satelliteIds.split('\n').map(l => l.trim()).filter(l => !!l).join(',')
-	// console.log(satelliteIds);
+	satelliteIds = satelliteIds.split('\n').map(l => l.trim()).filter(l => !!l)
 
-	let dataResponse = await axios.get('https://www.space-track.org/basicspacedata/query/class/tle_latest/ORDINAL/1/NORAD_CAT_ID/'+satelliteIds+'/orderby/TLE_LINE1 ASC/format/3le', {
-		headers: { 'Cookie': cookie }
+	let satelliteIdsChunks = array_chunks(satelliteIds, 500)
+	// console.log(satelliteIdsChunks);
+
+	let promises = satelliteIdsChunks.map(satelliteIds => {
+		let satelliteIdsText = satelliteIds.join(',')
+
+		return axios.get('https://www.space-track.org/basicspacedata/query/class/tle_latest/ORDINAL/1/NORAD_CAT_ID/'+satelliteIdsText+'/orderby/TLE_LINE1 ASC/format/3le', {
+			headers: { 'Cookie': cookie }
+		}).then(dataResponse => {
+			let data = parseTLE(dataResponse.data)
+			return data
+		})
 	})
 
-	let data = parseTLE(dataResponse.data)
-	return data
+	return Promise.all(promises).then(data => {
+		let finalData = []
+		for (const d of data) {
+			finalData = finalData.concat(d)
+		}
+		return new Promise((resolve, reject) => resolve(finalData))
+	})
 }
 
 
@@ -105,7 +121,7 @@ let parseTLE = (tle) => {
 }
 
 let designatorToLaunchNumber = (designator) => {
-	let launches = ['19029', '19074', '20001', '20006', '20012', '20019', '20025', '20035', '20038', '20055', '20057']
+	let launches = ['19029', '19074', '20001', '20006', '20012', '20019', '20025', '20035', '20038', '20055', '20057', '20062']
 	for (var l of launches) {
 		if (designator.includes(l)) return launches.indexOf(l)
 	}
