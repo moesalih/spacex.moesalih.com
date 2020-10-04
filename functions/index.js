@@ -1,4 +1,7 @@
 const functions = require('firebase-functions');
+var admin = require("firebase-admin");
+admin.initializeApp();
+var bucket = admin.storage().bucket();
 
 const fs = require('fs')
 const util = require('util')
@@ -15,12 +18,35 @@ const readFile_ = util.promisify(fs.readFile);
 let cacheControl = 'public, max-age=1800'
 
 
+exports.testCache = functions.https.onRequest(async (request, response) => {
+	try {
+		let launches = await cache('https://spacex.moesalih.com/api', 'launches.json')
+		response.json(launches)
+
+	} catch (e) {
+		console.log(e);
+		response.json({ error: e })
+	}
+})
 
 exports.scheduledCache = functions.pubsub.schedule('every 30 minutes').onRun(async (context) => {
-	await axios.get('https://spacex.moesalih.com/api')
-	await axios.get('https://spacex.moesalih.com/starlink/api')
+	await cache('https://spacex.moesalih.com/api', 'launches.json')
+	await cache('https://spacex.moesalih.com/starlink/api', 'starlink.json')
+	// await axios.get('https://spacex.moesalih.com/starlink/api')
 	return null
 })
+
+let cache = async (url, file) => {
+	let { data } = await axios.get(url)
+	if (!data) { return null }
+	await bucket.file(file).save(JSON.stringify(data), {
+		metadata: {
+			contentType: 'application/json'
+		}
+	})
+	return data
+}
+
 
 
 exports.starlinkApi = require('./starlink').starlinkApi

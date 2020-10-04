@@ -18,7 +18,7 @@ export default class Index extends React.Component {
 
 	async getLaunches() {
 	  try {
-	    const response = await axios.get('https://spacex.moesalih.com/api');
+	    const response = await axios.get('https://firebasestorage.googleapis.com/v0/b/spacex-launches-318bc.appspot.com/o/launches.json?alt=media');
 	    // console.log(response.data);
 		 this.setState({ launches: response.data.launches })
 	  } catch (error) {

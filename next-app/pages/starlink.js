@@ -63,7 +63,7 @@ export default class Starlink extends React.Component {
 
 	async getStarlinkData() {
 		try {
-			const response = await axios.get('https://spacex.moesalih.com/starlink/api')
+			const response = await axios.get('https://firebasestorage.googleapis.com/v0/b/spacex-launches-318bc.appspot.com/o/starlink.json?alt=media')
 			this.originalSatellitesData = response.data
 			this.calculateCurrentData()
 		} catch (error) {
