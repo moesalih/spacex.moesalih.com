@@ -21,7 +21,8 @@ let cacheControl = 'public, max-age=1800'
 exports.testCache = functions.https.onRequest(async (request, response) => {
 	try {
 		let launches = await cache('https://spacex.moesalih.com/api', 'launches.json')
-		response.json(launches)
+		let starlink = await cache('https://spacex.moesalih.com/starlink/api', 'starlink.json')
+		response.json({ launches, starlink })
 
 	} catch (e) {
 		console.log(e);
