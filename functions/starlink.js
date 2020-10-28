@@ -39,14 +39,16 @@ let getStarlinkData = async () => {
 	satelliteIds = satelliteIds.split('\n').map(l => l.trim()).filter(l => !!l)
 
 	let satelliteIdsChunks = array_chunks(satelliteIds, 500)
-	// console.log(satelliteIdsChunks);
+	console.log(satelliteIdsChunks.length);
 
 	let promises = satelliteIdsChunks.map(satelliteIds => {
 		let satelliteIdsText = satelliteIds.join(',')
+		console.log(satelliteIdsText);
 
-		return axios.get('https://www.space-track.org/basicspacedata/query/class/tle_latest/ORDINAL/1/NORAD_CAT_ID/'+satelliteIdsText+'/orderby/TLE_LINE1 ASC/format/3le', {
+		return axios.get('https://www.space-track.org/basicspacedata/query/class/gp/NORAD_CAT_ID/'+satelliteIdsText+'/orderby/TLE_LINE1 ASC/format/3le', {
 			headers: { 'Cookie': cookie }
 		}).then(dataResponse => {
+			console.log('response');
 			let data = parseTLE(dataResponse.data)
 			return data
 		})
@@ -121,7 +123,7 @@ let parseTLE = (tle) => {
 }
 
 let designatorToLaunchNumber = (designator) => {
-	let launches = ['19029', '19074', '20001', '20006', '20012', '20019', '20025', '20035', '20038', '20055', '20057', '20062', '20070']
+	let launches = ['19029', '19074', '20001', '20006', '20012', '20019', '20025', '20035', '20038', '20055', '20057', '20062', '20070', '20073']
 	for (var l of launches) {
 		if (designator.includes(l)) return launches.indexOf(l)
 	}
