@@ -8,6 +8,10 @@ import { GoogleMap, LoadScript, Circle } from '@react-google-maps/api';
 import { Scatter } from 'react-chartjs-2'
 import { getEpochTimestamp, getSatelliteInfo } from 'tle.js'
 
+import * as Planetaryjs from 'planetary.js';
+import worldData from 'planetary.js/dist/world-110m.json';
+
+
 
 let colors = [
 	'200,200,200',
@@ -55,7 +59,7 @@ export default class Starlink extends React.Component {
 
 	constructor(props) {
 		super(props)
-		this.state = {}
+		this.state = { showGlobe: true }
 		this.getStarlinkData()
 	}
 
@@ -458,66 +462,87 @@ export default class Starlink extends React.Component {
 								<div class="text-center my-5 text-black-50"><div class="spinner-border" role="status"></div></div>
 							}
 
-							{this.state.chartData && this.state.isPast &&
-								<div class="mb-1 text-black-50 small">
-									<span className="mr-2">Animation shows most recent orbit (92 mins)</span>
-									<a href="" onClick={(e) => { e.preventDefault(); this.calculateCurrentData() }}>Stop</a>
-								</div>
-							}
-							{this.state.chartData && !this.state.isPast &&
-								<div class="mb-1  small">
-									<a href="" onClick={(e) => { e.preventDefault(); this.calculatePastData() }}>Animate most recent orbit</a>
-								</div>
-							}
-
 							{this.state.chartData &&
-								<div class="mb-2 embed-responsive embed-responsive-16by9">
-									<div class="embed-responsive-item">
-										<LoadScript googleMapsApiKey={googleMapsApiKey} >
-											<GoogleMap
-												mapContainerStyle={containerStyle}
-												center={center}
-												zoom={window.innerWidth < 1000 ? 1 : 2}
-												options={{ styles: styles, disableDefaultUI: true, zoomControl: true }}
-											>
-												{this.state.satellites.filter(s => !!s.currentInfo.lat).map(s =>
-													<Circle
-														center={{ lat: s.currentInfo.lat, lng: s.currentInfo.lng }}
-														radius={60000}
-														options={{ fillOpacity: 1, fillColor: 'rgba(' + s.color + ',' + Starlink.opacityFrom(s) + ')', strokeColor: 'rgba(' + s.color + ',' + Starlink.opacityFrom(s) + ')', strokeWidth: 1 }}
-														key={s.id} />
-												)}
-											</GoogleMap>
-										</LoadScript>
+								<>
+
+									<div className="mb-1">
+										{this.state.isPast &&
+											<div class="d-inline-block mr-3  text-black-50 small">
+												<span className="mr-2">Animation shows most recent orbit (92 mins)</span>
+												<a href="" onClick={(e) => { e.preventDefault(); this.calculateCurrentData() }}>Stop</a>
+											</div>
+										}
+										{!this.state.isPast &&
+											<div class="d-inline-block mr-3  small">
+												<a href="" onClick={(e) => { e.preventDefault(); this.calculatePastData() }}>Animate most recent orbit</a>
+											</div>
+										}
+										{!this.state.showGlobe &&
+											<div class="d-inline-block  small">
+												<a href="" onClick={(e) => { e.preventDefault(); this.setState({ showGlobe: true }) }}>Show Globe</a>
+											</div>
+										}
+										{this.state.showGlobe &&
+											<div class="d-inline-block  small">
+												<a href="" onClick={(e) => { e.preventDefault(); this.setState({ showGlobe: false }) }}>Show Map</a>
+											</div>
+										}
+
 									</div>
-								</div>
-							}
 
-							{this.state.chartData &&
-								<div class="text-center text-black-50 small">
-									<div className=" text-monospace small">{moment(this.state.timestamp).format('YYYY-MM-DD HH:mm:ss')}</div>
-								</div>
-							}
+									{!this.state.showGlobe &&
+										<div class="mb-2 embed-responsive embed-responsive-16by9">
+											<div class="embed-responsive-item">
+												<LoadScript googleMapsApiKey={googleMapsApiKey} >
+													<GoogleMap
+														mapContainerStyle={containerStyle}
+														center={center}
+														zoom={window.innerWidth < 1000 ? 1 : 2}
+														options={{ styles: styles, disableDefaultUI: true, zoomControl: true }}
+													>
+														{this.state.satellites.filter(s => !!s.currentInfo.lat).map(s =>
+															<Circle
+																center={{ lat: s.currentInfo.lat, lng: s.currentInfo.lng }}
+																radius={60000}
+																options={{ fillOpacity: 1, fillColor: 'rgba(' + s.color + ',' + Starlink.opacityFrom(s) + ')', strokeColor: 'rgba(' + s.color + ',' + Starlink.opacityFrom(s) + ')', strokeWidth: 1 }}
+																key={s.id} />
+														)}
+													</GoogleMap>
+												</LoadScript>
+											</div>
+										</div>
+									}
 
-							{this.state.chartData &&
-								<div class="mb-2 embed-responsive embed-responsive-16by9 embed-responsive-narrowsquare">
-									<div class="embed-responsive-item">
-										<Scatter data={this.state.chartData} options={this.state.chartOptions} />
+									{this.state.showGlobe &&
+										<div class="mb-2 embed-responsive embed-responsive-1by1">
+											<div class="embed-responsive-item">
+												<Planet satellites={this.state.satellites.filter(s => !!s.currentInfo.lat)} />
+											</div>
+										</div>
+									}
+
+									<div class="text-center text-black-50 small">
+										<div className=" text-monospace small">{moment(this.state.timestamp).format('YYYY-MM-DD HH:mm:ss')}</div>
 									</div>
-								</div>
-							}
 
-							{this.state.chartData &&
-								<div class="small my-5">
-									<p>This chart show the current orbital parameters of each Starlink satellite launched so far.</p>
-									<p><strong>Anomaly past Ascending Node</strong> refers to the position of each satellite in its plane, and is the sum of <a href="https://en.wikipedia.org/wiki/Argument_of_periapsis" target="_blank">Argument of perigee</a> and <a href="https://en.wikipedia.org/wiki/Mean_anomaly" target="_blank">Mean anomoly</a>.</p>
-									<p><a href="https://en.wikipedia.org/wiki/Longitude_of_the_ascending_node" target="_blank"><strong>Longitude of Ascending Node</strong></a> refers to the orientation of each satellite's plane.</p>
-									<p>Altitude is represented by the opacity of each point (300 - 550 KM)</p>
-									<p>All Starlink satellites have the same inclination of 53°</p>
+									<div class="mb-2 embed-responsive embed-responsive-16by9 embed-responsive-narrowsquare">
+										<div class="embed-responsive-item">
+											<Scatter data={this.state.chartData} options={this.state.chartOptions} />
+										</div>
+									</div>
 
-									<p>More info here: <a href="https://en.wikipedia.org/wiki/Orbital_elements" target="_blank">Orbital Elements (Wikipedia)</a></p>
+									<div class="small my-5">
+										<p>This chart show the current orbital parameters of each Starlink satellite launched so far.</p>
+										<p><strong>Anomaly past Ascending Node</strong> refers to the position of each satellite in its plane, and is the sum of <a href="https://en.wikipedia.org/wiki/Argument_of_periapsis" target="_blank">Argument of perigee</a> and <a href="https://en.wikipedia.org/wiki/Mean_anomaly" target="_blank">Mean anomoly</a>.</p>
+										<p><a href="https://en.wikipedia.org/wiki/Longitude_of_the_ascending_node" target="_blank"><strong>Longitude of Ascending Node</strong></a> refers to the orientation of each satellite's plane.</p>
+										<p>Altitude is represented by the opacity of each point (300 - 550 KM)</p>
+										<p>All Starlink satellites have the same inclination of 53°</p>
 
-								</div>
+										<p>More info here: <a href="https://en.wikipedia.org/wiki/Orbital_elements" target="_blank">Orbital Elements (Wikipedia)</a></p>
+
+									</div>
+
+								</>
 							}
 
 
@@ -553,4 +578,67 @@ export default class Starlink extends React.Component {
 			</div>
 		)
 	}
+}
+
+
+class Planet extends React.Component {
+
+	planet = null
+
+	getCircles() {
+		return this.props.satellites.map(s => {
+			return {
+				circle: d3.geo.circle().origin([s.currentInfo.lng, s.currentInfo.lat]).angle(0.2)(),
+				color: 'rgba(' + s.color + ',' + Starlink.opacityFrom(s) + ')'
+			}
+		})
+	}
+
+	componentDidMount() {
+		this.planet = Planetaryjs.planet();
+		const canvas = document.getElementById('globe');
+
+		this.planet.loadPlugin(
+			Planetaryjs.plugins.earth({
+				topojson: { world: worldData },
+				oceans: { fill: '#fcfcfc' },
+				land: { fill: '#eee' },
+				borders: { stroke: '#fcfcfc' },
+			})
+		);
+		this.planet.loadPlugin(Planetaryjs.plugins.pings());
+		this.planet.loadPlugin(Planetaryjs.plugins.drag());
+
+		this.planet.projection.scale(canvas.width / 2).translate([canvas.width / 2, canvas.width / 2]).rotate([90, -10])
+		this.planet.draw(canvas);
+
+		// this.planet.plugins.pings.add(10, 10, { color: 'red', angle: 0 })
+
+
+		this.planet.onDraw(() => {
+			this.planet.withSavedContext((context) => {
+
+				context.lineWidth = 5
+
+				this.getCircles().forEach(circle => {
+					context.strokeStyle = circle.color
+					context.beginPath();
+					this.planet.path.context(context)(circle.circle);
+					context.stroke();
+				});
+
+			});
+		});
+
+		// console.log('planet mount', this.props);
+	}
+
+
+
+	render() {
+		return (
+			<canvas id="globe" width="825" height="825" style={{ width: '100%', height: '100%' }} />
+		)
+	}
+
 }
