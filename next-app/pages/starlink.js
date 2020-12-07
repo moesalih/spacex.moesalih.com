@@ -24,10 +24,11 @@ let colors = [
 	'140,140,140',
 	'140,140,140',
 	'140,140,140',
+	'140,140,140',
 
-	'255, 99, 172',
-	'100, 200, 75',
 	'54, 162, 235',
+	'100, 200, 75',
+	'255, 99, 172',
 	'255, 206, 86',
 	'153, 102, 255',
 	'255, 120, 99',
@@ -601,9 +602,9 @@ class Planet extends React.Component {
 		this.planet.loadPlugin(
 			Planetaryjs.plugins.earth({
 				topojson: { world: worldData },
-				oceans: { fill: '#fcfcfc' },
-				land: { fill: '#eee' },
-				borders: { stroke: '#fcfcfc' },
+				oceans: { fill: '#f3f3f3' },
+				land: { fill: '#ddd' },
+				borders: { stroke: '#eee' },
 			})
 		);
 		this.planet.loadPlugin(Planetaryjs.plugins.pings());
