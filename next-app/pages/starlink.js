@@ -14,7 +14,7 @@ import worldData from 'planetary.js/dist/world-110m.json';
 
 
 let colors = [
-	'200,200,200',
+	'100,100,100',
 
 	'140,140,140',
 	'140,140,140',
@@ -64,6 +64,9 @@ export default class Starlink extends React.Component {
 		this.getStarlinkData()
 	}
 
+	componentDidMount() {
+		document.body.setAttribute('data-theme', 'dark')
+	}
 	componentWillUnmount() {
 		clearTimeout(this.timer)
 	}
@@ -187,26 +190,35 @@ export default class Starlink extends React.Component {
 					scaleLabel: {
 						labelString: 'Anomaly past Ascending Node',
 						display: true,
-						fontColor: '#999',
+						fontColor: '#666',
 					},
 					ticks: {
 						max: 360,
 						min: 0,
 						stepSize: 20,
 						fontSize: 10,
-					}
+						// color: '#666',
+					},
+					gridLines: {
+						color: '#222',
+						zeroLineColor: '#444',
+					},
 				}],
 				xAxes: [{
 					scaleLabel: {
 						labelString: 'Longitude of Ascending Node',
 						display: true,
-						fontColor: '#999',
+						fontColor: '#666',
 					},
 					ticks: {
 						max: 180,
 						min: -180,
 						stepSize: 20,
 						fontSize: 10,
+					},
+					gridLines: {
+						color: '#222',
+						zeroLineColor: '#444',
 					},
 				}]
 			},
@@ -258,7 +270,7 @@ export default class Starlink extends React.Component {
 				"elementType": "geometry",
 				"stylers": [
 					{
-						"color": "#eeeeee"
+						"color": "#333333"
 					}
 				]
 			},
@@ -274,7 +286,7 @@ export default class Starlink extends React.Component {
 				"elementType": "labels.text.fill",
 				"stylers": [
 					{
-						"color": "#616161"
+						"color": "#00999999"
 					}
 				]
 			},
@@ -282,7 +294,7 @@ export default class Starlink extends React.Component {
 				"elementType": "labels.text.stroke",
 				"stylers": [
 					{
-						"color": "#f5f5f5"
+						"color": "#00444444"
 					}
 				]
 			},
@@ -399,7 +411,7 @@ export default class Starlink extends React.Component {
 				"elementType": "geometry",
 				"stylers": [
 					{
-						"color": "#fcfcfc"
+						"color": "#111111"
 					}
 				]
 			},
@@ -408,7 +420,7 @@ export default class Starlink extends React.Component {
 				"elementType": "labels.text.fill",
 				"stylers": [
 					{
-						"color": "#9e9e9e"
+						"color": "#00333333"
 					}
 				]
 			}
@@ -425,6 +437,7 @@ export default class Starlink extends React.Component {
 
 					<link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_o5hd5vvqpoqiwwmi.css" />
 					<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+					<link rel="stylesheet" type="text/css" href="/bootstrap-dark.css" />
 
 					<script async src="https://www.googletagmanager.com/gtag/js?id=UA-33281840-7"></script>
 					<script dangerouslySetInnerHTML={{
@@ -460,7 +473,7 @@ export default class Starlink extends React.Component {
 						<div class="col-md-9">
 
 							{!this.state.chartData &&
-								<div class="text-center my-5 text-black-50"><div class="spinner-border" role="status"></div></div>
+								<div class="text-center my-5 text-muted"><div class="spinner-border" role="status"></div></div>
 							}
 
 							{this.state.chartData &&
@@ -468,8 +481,8 @@ export default class Starlink extends React.Component {
 
 									<div className="mb-1">
 										{this.state.isPast &&
-											<div class="d-inline-block mr-3  text-black-50 small">
-												<span className="mr-2">Animation shows most recent orbit (92 mins)</span>
+											<div class="d-inline-block mr-3   small">
+												<span className="text-muted mr-2">Animation shows most recent orbit (92 mins)</span>
 												<a href="" onClick={(e) => { e.preventDefault(); this.calculateCurrentData() }}>Stop</a>
 											</div>
 										}
@@ -522,7 +535,7 @@ export default class Starlink extends React.Component {
 										</div>
 									}
 
-									<div class="text-center text-black-50 small">
+									<div class="text-center text-muted small">
 										<div className=" text-monospace small">{moment(this.state.timestamp).format('YYYY-MM-DD HH:mm:ss')}</div>
 									</div>
 
@@ -602,9 +615,9 @@ class Planet extends React.Component {
 		this.planet.loadPlugin(
 			Planetaryjs.plugins.earth({
 				topojson: { world: worldData },
-				oceans: { fill: '#f3f3f3' },
-				land: { fill: '#ddd' },
-				borders: { stroke: '#eee' },
+				oceans: { fill: '#222' },
+				land: { fill: '#333' },
+				borders: { stroke: '#222' },
 			})
 		);
 		this.planet.loadPlugin(Planetaryjs.plugins.pings());

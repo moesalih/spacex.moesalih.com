@@ -14,6 +14,9 @@ export default class Index extends React.Component {
 		this.getLaunches()
 		// this.onGenerate = this.onGenerate.bind(this)
 	}
+	componentDidMount() {
+		document.body.setAttribute('data-theme', 'dark')
+	}
 
 
 	async getLaunches() {
@@ -38,6 +41,7 @@ export default class Index extends React.Component {
 
 					<link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_o5hd5vvqpoqiwwmi.css" />
 					<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+					<link rel="stylesheet" type="text/css" href="/bootstrap-dark.css" />
 
 					/*  Global site tag (gtag.js) - Google Analytics --> */
 					<script async src="https://www.googletagmanager.com/gtag/js?id=UA-33281840-7"></script>
