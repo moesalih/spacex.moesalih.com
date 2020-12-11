@@ -539,7 +539,7 @@ export default class Starlink extends React.Component {
 										<div className=" text-monospace small">{moment(this.state.timestamp).format('YYYY-MM-DD HH:mm:ss')}</div>
 									</div>
 
-									<div class="mb-2 embed-responsive embed-responsive-16by9 embed-responsive-narrowsquare">
+									<div class="mb-2 embed-responsive embed-responsive-1by1">
 										<div class="embed-responsive-item">
 											<Scatter data={this.state.chartData} options={this.state.chartOptions} />
 										</div>
