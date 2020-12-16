@@ -78,8 +78,8 @@ export default class Index extends React.Component {
 							<div key={i}>
 								<div class="font-weight-bold">{l.dateText}</div>
 								<div class="my-1">{l.payloadIcon} {l.payload} • {l.customer}</div>
-								<div class="small my-1" style={{opacity:0.5}}>{l.type} • {l.site} • {l.orbit}</div>
-								<div class="small">{l.note}</div>
+								<div class="small font-weight-bold my-1" style={{opacity:0.5}}>{l.type} • {l.site} • {l.orbit}</div>
+								<div class="small" style={{opacity:0.5}}>{l.note}</div>
 								<hr />
 							</div>
 						)}

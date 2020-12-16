@@ -156,6 +156,7 @@ async function getLaunches() {
 				launch.payload = removeReferences(children.eq(3).text())
 				if (launch.payload.includes('Starlink')) launch.payloadIcon = '🛰'
 				if (launch.payload.includes('GPS')) launch.payloadIcon = '📍'
+				if (launch.payload.includes('CRS')) launch.payloadIcon = '📦'
 				launch.orbit = removeReferences(children.eq(4).text())
 				launch.customer = removeReferences(children.eq(5).text())
 			}
@@ -164,7 +165,7 @@ async function getLaunches() {
 			}
 			else if (children.first().attr("colspan")) {
 				launch.note = removeReferences(children.eq(0).text())
-				if (launch.note.includes('astronaut')) launch.payloadIcon = '👨‍🚀'
+				if (launch.note.toLowerCase().includes('astronaut')) launch.payloadIcon = '👨‍🚀'
 				if (launch.note.toLowerCase().includes('lunar')) launch.payloadIcon = '🌘'
 				if (launch.note.toLowerCase().includes('classified')) launch.payloadIcon = '👽'
 				if (launch.note.toLowerCase().includes('tourist')) launch.payloadIcon = '👨‍🚀'

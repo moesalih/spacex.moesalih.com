@@ -60,7 +60,7 @@ export default class Starlink extends React.Component {
 
 	constructor(props) {
 		super(props)
-		this.state = { showGlobe: true }
+		this.state = { showView: 'globe' }
 		this.getStarlinkData()
 	}
 
@@ -479,32 +479,30 @@ export default class Starlink extends React.Component {
 							{this.state.chartData &&
 								<>
 
-									<div className="mb-1">
+									<div className="text-center">
 										{this.state.isPast &&
-											<div class="d-inline-block mr-3   small">
-												<span className="text-muted mr-2">Animation shows most recent orbit (92 mins)</span>
-												<a href="" onClick={(e) => { e.preventDefault(); this.calculateCurrentData() }}>Stop</a>
+											<div class="btn-group btn-group-sm mx-2 mb-2" role="group" >
+												<button type="button" className="btn btn-outline-secondary disabled" >Animating most recent orbit (92 mins)</button>
+												<a href="" className="btn btn-outline-secondary " onClick={(e) => { e.preventDefault(); this.calculateCurrentData() }}>Stop</a>
 											</div>
 										}
 										{!this.state.isPast &&
-											<div class="d-inline-block mr-3  small">
-												<a href="" onClick={(e) => { e.preventDefault(); this.calculatePastData() }}>Animate most recent orbit</a>
+											<div class="btn-group btn-group-sm mx-2 mb-2" role="group" >
+												<a href="" className="btn btn-outline-secondary " onClick={(e) => { e.preventDefault(); this.calculatePastData() }}>Animate most recent orbit</a>
 											</div>
 										}
-										{!this.state.showGlobe &&
-											<div class="d-inline-block  small">
-												<a href="" onClick={(e) => { e.preventDefault(); this.setState({ showGlobe: true }) }}>Show Globe</a>
-											</div>
-										}
-										{this.state.showGlobe &&
-											<div class="d-inline-block  small">
-												<a href="" onClick={(e) => { e.preventDefault(); this.setState({ showGlobe: false }) }}>Show Map</a>
-											</div>
-										}
-
+										<div class="btn-group btn-group-sm mx-2 mb-2" role="group" >
+											<button type="button" className={"btn btn-outline-secondary " + (this.state.showView == 'globe' ? 'active' : '')} onClick={(e) => { e.preventDefault(); this.setState({ showView: 'globe' }) }}>Globe</button>
+											<button type="button" className={"btn btn-outline-secondary " + (this.state.showView == 'map' ? 'active' : '')} onClick={(e) => { e.preventDefault(); this.setState({ showView: 'map' }) }}>Map</button>
+											<button type="button" className={"btn btn-outline-secondary " + (this.state.showView == 'params' ? 'active' : '')} onClick={(e) => { e.preventDefault(); this.setState({ showView: 'params' }) }}>Parameters</button>
+										</div>
 									</div>
 
-									{!this.state.showGlobe &&
+									<div class="text-center text-muted small mb-2">
+										<div className=" text-monospace small">{moment(this.state.timestamp).format('YYYY-MM-DD HH:mm:ss')}</div>
+									</div>
+
+									{this.state.showView == 'map' &&
 										<div class="mb-2 embed-responsive embed-responsive-16by9">
 											<div class="embed-responsive-item">
 												<LoadScript googleMapsApiKey={googleMapsApiKey} >
@@ -527,7 +525,7 @@ export default class Starlink extends React.Component {
 										</div>
 									}
 
-									{this.state.showGlobe &&
+									{this.state.showView == 'globe' &&
 										<div class="mb-2 embed-responsive embed-responsive-1by1">
 											<div class="embed-responsive-item">
 												<Planet satellites={this.state.satellites.filter(s => !!s.currentInfo.lat)} />
@@ -535,15 +533,14 @@ export default class Starlink extends React.Component {
 										</div>
 									}
 
-									<div class="text-center text-muted small">
-										<div className=" text-monospace small">{moment(this.state.timestamp).format('YYYY-MM-DD HH:mm:ss')}</div>
-									</div>
-
-									<div class="mb-2 embed-responsive embed-responsive-1by1">
-										<div class="embed-responsive-item">
-											<Scatter data={this.state.chartData} options={this.state.chartOptions} />
+									{this.state.showView == 'params' &&
+										<div class="mb-2 embed-responsive embed-responsive-1by1">
+											<div class="embed-responsive-item">
+												<Scatter data={this.state.chartData} options={this.state.chartOptions} />
+											</div>
 										</div>
-									</div>
+									}
+
 
 									<div class="small my-5">
 										<p>This chart show the current orbital parameters of each Starlink satellite launched so far.</p>
