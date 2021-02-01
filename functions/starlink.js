@@ -85,7 +85,7 @@ let parseTLE = (tle) => {
 			case '1': // info
 			currentSatellite.tle1 = line
 			currentSatellite.designator = components[2]
-			currentSatellite.launch = 'Starlink-'+designatorToLaunchNumber(currentSatellite.designator)
+			currentSatellite.launch = designatorToLaunchNumber(currentSatellite.designator)
 			let yearText = components[3].substring(0,2)
 			currentSatellite.year = parseInt(yearText) + 2000
 			let dayText = components[3].substring(2)
@@ -123,9 +123,31 @@ let parseTLE = (tle) => {
 }
 
 let designatorToLaunchNumber = (designator) => {
-	let launches = ['19029', '19074', '20001', '20006', '20012', '20019', '20025', '20035', '20038', '20055', '20057', '20062', '20070', '20073', '20074', '20088']
-	for (var l of launches) {
-		if (designator.includes(l)) return launches.indexOf(l)
+	let launches = {
+		'19029': 'Starlink-0',
+		'19074': 'Starlink-1',
+
+		'20001': 'Starlink-2',
+		'20006': 'Starlink-3',
+		'20012': 'Starlink-4',
+		'20019': 'Starlink-5',
+		'20025': 'Starlink-6',
+		'20035': 'Starlink-7',
+		'20038': 'Starlink-8',
+		'20055': 'Starlink-9',
+		'20057': 'Starlink-10',
+		'20062': 'Starlink-11',
+		'20070': 'Starlink-12',
+		'20073': 'Starlink-13',
+		'20074': 'Starlink-14',
+		'20088': 'Starlink-15',
+		
+		'21005': 'Starlink-16',
+		'21006': 'Starlink-Polar',
 	}
-	return 'X'
+	// let launches = ['19029', '19074', '20001', '20006', '20012', '20019', '20025', '20035', '20038', '20055', '20057', '20062', '20070', '20073', '20074', '20088', '21005', '21006']
+	for (var l in launches) {
+		if (designator.includes(l)) return launches[l]
+	}
+	return 'Starlink-X'
 }
