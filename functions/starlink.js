@@ -125,17 +125,17 @@ let parseTLE = (tle) => {
 let designatorToLaunchNumber = (designator) => {
 	let launches = {
 		'19029': 'Starlink-0',
-		'19074': 'Starlink-1',
+		'19074': 'Starlink 1-10',
 
-		'20001': 'Starlink-2',
-		'20006': 'Starlink-3',
-		'20012': 'Starlink-4',
-		'20019': 'Starlink-5',
-		'20025': 'Starlink-6',
-		'20035': 'Starlink-7',
-		'20038': 'Starlink-8',
-		'20055': 'Starlink-9',
-		'20057': 'Starlink-10',
+		'20001': 'Starlink 1-10',
+		'20006': 'Starlink 1-10',
+		'20012': 'Starlink 1-10',
+		'20019': 'Starlink 1-10',
+		'20025': 'Starlink 1-10',
+		'20035': 'Starlink 1-10',
+		'20038': 'Starlink 1-10',
+		'20055': 'Starlink 1-10',
+		'20057': 'Starlink 1-10',
 		'20062': 'Starlink-11',
 		'20070': 'Starlink-12',
 		'20073': 'Starlink-13',
@@ -145,6 +145,7 @@ let designatorToLaunchNumber = (designator) => {
 		'21005': 'Starlink-16',
 		'21006': 'Starlink-Polar',
 		'21009': 'Starlink-18',
+		'21012': 'Starlink-19',
 	}
 	for (var l in launches) {
 		if (designator.includes(l)) return launches[l]
