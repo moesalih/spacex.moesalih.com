@@ -141,12 +141,13 @@ let designatorToLaunchNumber = (designator) => {
 		'20073': 'Starlink-13',
 		'20074': 'Starlink-14',
 		'20088': 'Starlink-15',
-		
+
 		'21005': 'Starlink-16',
 		'21006': 'Starlink-Polar',
 		'21009': 'Starlink-18',
 		'21012': 'Starlink-19',
 		'21017': 'Starlink-17',
+		'21018': 'Starlink-20',
 	}
 	for (var l in launches) {
 		if (designator.includes(l)) return launches[l]
