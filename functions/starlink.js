@@ -29,15 +29,22 @@ module.exports.starlinkApi = functions.https.onRequest(async (request, response)
 let array_chunks = (array, chunk_size) => Array(Math.ceil(array.length / chunk_size)).fill(0).map((_, index) => index * chunk_size).map(begin => array.slice(begin, begin + chunk_size));
 
 let getStarlinkData = async () => {
+	// Login to space-track.org
 	let loginReposnse = await axios.post('https://www.space-track.org/ajaxauth/login', {
 		identity: functions.config().spacetrack.email,
 		password: functions.config().spacetrack.password
 	})
 	let cookie = loginReposnse.headers['set-cookie'][0]
 
-	let satelliteIds = require('fs').readFileSync('starlink-satellites.txt', 'utf8')
-	satelliteIds = satelliteIds.split('\n').map(l => l.trim()).filter(l => !!l)
 
+	// get list of satellite IDs
+	let satelliteIdsResponse = await axios.get('https://www.space-track.org/basicspacedata/query/class/satcat/SATNAME/~~starlink/orderby/NORAD_CAT_ID%20asc/', {
+		headers: { 'Cookie': cookie }
+	})
+	let satelliteIds = satelliteIdsResponse.data.map(d => d.NORAD_CAT_ID)
+
+
+	// get TLEs
 	let satelliteIdsChunks = array_chunks(satelliteIds, 500)
 	console.log(satelliteIdsChunks.length);
 
@@ -147,6 +154,7 @@ let designatorToLaunchNumber = (designator) => {
 		'21009': 'Starlink-18',
 		'21012': 'Starlink-19',
 		'21017': 'Starlink-17',
+		'21018': 'Starlink-20',
 	}
 	for (var l in launches) {
 		if (designator.includes(l)) return launches[l]

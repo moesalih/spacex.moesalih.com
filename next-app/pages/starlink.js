@@ -17,15 +17,6 @@ let colors = [
 	'100,100,100',
 
 	'140,140,140',
-	// '140,140,140',
-	// '140,140,140',
-	// '140,140,140',
-	// '140,140,140',
-	// '140,140,140',
-	// '140,140,140',
-	// '140,140,140',
-	// '140,140,140',
-	// '140,140,140',
 
 	'54, 162, 235',
 	'100, 200, 75',
@@ -33,12 +24,11 @@ let colors = [
 	'255, 206, 86',
 	'153, 102, 255',
 	'255, 120, 99',
-
 	'192, 192, 75',
 	'75, 192, 192',
 	'255, 159, 64',
 	'100, 120, 200',
-	'100, 100, 100',
+	'200, 50, 50',
 
 	'160,160,160',
 	'160,160,160',
@@ -562,23 +552,24 @@ export default class Starlink extends React.Component {
 						<div class="col-md-3 ">
 							<div class="sticky-top pt-0">
 								<div class="rounded small bg-light p-3 " id="info">
-									<div class="mb-3"><a href="/starlink/api" target="_blank">API</a></div>
+									<div class=""><a href="/starlink/api" target="_blank">API</a></div>
+									<div class=""><a href="https://www.youtube.com/channel/UC10UDNVApSXd9AJ5gwDWWeg" target="_blank" class="mr-2">YouTube</a></div>
 
-									<div class="text-uppercase small text-muted">Source</div>
+									<div class="mt-3 text-uppercase small text-muted">Source</div>
 									<div class=""><a href="https://www.space-track.org/" target="_blank">Space-Track.org</a></div>
-									<div class="mb-3"><a href="https://www.n2yo.com/satellites/?c=52&srt=12&dir=0" target="_blank">n2yo.com</a></div>
+									{/* <div class=""><a href="https://www.n2yo.com/satellites/?c=52&srt=12&dir=0" target="_blank">n2yo.com</a></div> */}
 
-									<div class="text-uppercase small text-muted">Created by</div>
-									<div class="mb-3"><a href="https://moesalih.com" target="_blank" class="mr-3">Moe Salih</a></div>
+									<div class="mt-3 text-uppercase small text-muted">Created by</div>
+									<div class=""><a href="https://moesalih.com" target="_blank" class="mr-3">Moe Salih</a></div>
 
-									<div class="text-uppercase small text-muted">Contact</div>
-									<div class="mb-3"><a href="mailto:moe.salih@gmail.com" target="_blank" class="text-decoration-none mr-2"><i class="feather icon-mail"></i></a> <a href="https://twitter.com/moesalih_" target="_blank" class="text-decoration-none mr-2"><i class="feather icon-twitter"></i></a></div>
+									<div class="mt-3 text-uppercase small text-muted">Contact</div>
+									<div class=""><a href="mailto:moe.salih@gmail.com" target="_blank" class="text-decoration-none mr-2"><i class="feather icon-mail"></i></a> <a href="https://twitter.com/moesalih_" target="_blank" class="text-decoration-none mr-2"><i class="feather icon-twitter"></i></a></div>
 
-									<div class="text-uppercase small text-muted">Code</div>
-									<div class="mb-3"><a href="https://github.com/moesalih/spacex.moesalih.com" target="_blank" class="mr-3">GitHub</a></div>
+									<div class="mt-3 text-uppercase small text-muted">Code</div>
+									<div class=""><a href="https://github.com/moesalih/spacex.moesalih.com" target="_blank" class="mr-3">GitHub</a></div>
 
-									<div class="text-uppercase small text-muted">Support this site</div>
-									<div class=""><a href="https://www.paypal.me/moesalih1" target="_blank">Donate</a></div>
+									<div class="mt-3 text-uppercase small text-muted">Support this site</div>
+									<div class=""><a href="https://www.paypal.me/moesalih1" target="_blank">Donate</a> 🙏</div>
 
 								</div>
 							</div>
