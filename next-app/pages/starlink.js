@@ -23,14 +23,15 @@ let colors = [
 	'255, 99, 172',
 	'255, 206, 86',
 	'153, 102, 255',
-	'255, 120, 99',
-	'192, 192, 75',
 	'75, 192, 192',
+	'192, 192, 75',
+	'255, 120, 99',
 	'255, 159, 64',
 	'100, 120, 200',
-	'200, 50, 50',
+	'255, 206, 86',
 	'50, 200, 50',
-	'200, 100, 50',
+	'200, 100, 100',
+	'54, 162, 235',
 
 	'160,160,160',
 	'160,160,160',
@@ -472,7 +473,7 @@ export default class Starlink extends React.Component {
 							{this.state.chartData &&
 								<>
 
-									<div className="text-center">
+									<div className="text-center mb-3">
 										{this.state.isPast &&
 											<div class="btn-group btn-group-sm mx-2 mb-2" role="group" >
 												<button type="button" className="btn btn-outline-secondary disabled" >Animating most recent orbit (92 mins)</button>
@@ -491,9 +492,12 @@ export default class Starlink extends React.Component {
 										</div>
 									</div>
 
+
 									<div class="text-center text-muted small mb-2">
-										<div className=" text-monospace small">{moment(this.state.timestamp).format('YYYY-MM-DD HH:mm:ss')}</div>
+										<div className=" mb-2">{this.state.satellites.length} launched satellites</div>
+										<div className=" text-monospace">{moment(this.state.timestamp).format('YYYY-MM-DD HH:mm:ss')}</div>
 									</div>
+
 
 									{this.state.showView == 'map' &&
 										<div class="mb-2 embed-responsive embed-responsive-16by9">
@@ -527,24 +531,26 @@ export default class Starlink extends React.Component {
 									}
 
 									{this.state.showView == 'params' &&
-										<div class="mb-2 embed-responsive embed-responsive-1by1">
-											<div class="embed-responsive-item">
-												<Scatter data={this.state.chartData} options={this.state.chartOptions} />
+										<>
+											<div class="mb-2 embed-responsive embed-responsive-1by1">
+												<div class="embed-responsive-item">
+													<Scatter data={this.state.chartData} options={this.state.chartOptions} />
+												</div>
 											</div>
-										</div>
+											<div class="small my-5">
+												<p>This chart show the current orbital parameters of each Starlink satellite launched so far.</p>
+												<p><strong>Anomaly past Ascending Node</strong> refers to the position of each satellite in its plane, and is the sum of <a href="https://en.wikipedia.org/wiki/Argument_of_periapsis" target="_blank">Argument of perigee</a> and <a href="https://en.wikipedia.org/wiki/Mean_anomaly" target="_blank">Mean anomoly</a>.</p>
+												<p><a href="https://en.wikipedia.org/wiki/Longitude_of_the_ascending_node" target="_blank"><strong>Longitude of Ascending Node</strong></a> refers to the orientation of each satellite's plane.</p>
+												<p>Altitude is represented by the opacity of each point (300 - 550 KM)</p>
+												<p>All Starlink satellites have the same inclination of 53°</p>
+
+												<p>More info here: <a href="https://en.wikipedia.org/wiki/Orbital_elements" target="_blank">Orbital Elements (Wikipedia)</a></p>
+
+											</div>
+										</>
 									}
 
 
-									<div class="small my-5">
-										<p>This chart show the current orbital parameters of each Starlink satellite launched so far.</p>
-										<p><strong>Anomaly past Ascending Node</strong> refers to the position of each satellite in its plane, and is the sum of <a href="https://en.wikipedia.org/wiki/Argument_of_periapsis" target="_blank">Argument of perigee</a> and <a href="https://en.wikipedia.org/wiki/Mean_anomaly" target="_blank">Mean anomoly</a>.</p>
-										<p><a href="https://en.wikipedia.org/wiki/Longitude_of_the_ascending_node" target="_blank"><strong>Longitude of Ascending Node</strong></a> refers to the orientation of each satellite's plane.</p>
-										<p>Altitude is represented by the opacity of each point (300 - 550 KM)</p>
-										<p>All Starlink satellites have the same inclination of 53°</p>
-
-										<p>More info here: <a href="https://en.wikipedia.org/wiki/Orbital_elements" target="_blank">Orbital Elements (Wikipedia)</a></p>
-
-									</div>
 
 								</>
 							}

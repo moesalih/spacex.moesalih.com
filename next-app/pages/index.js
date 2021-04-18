@@ -104,7 +104,7 @@ export default class Index extends React.Component {
 									<div class="mb-3"><a href="https://github.com/moesalih/spacex.moesalih.com" target="_blank" class="mr-3">GitHub</a></div>
 
 									<div  class="text-uppercase small text-muted">Support this site</div>
-									<div class=""><a href="https://www.paypal.me/moesalih1" target="_blank">Donate</a></div>
+									<div class=""><a href="https://www.paypal.me/moesalih1" target="_blank">Donate</a> 🙏</div>
 
 								</div>
 							</div>
