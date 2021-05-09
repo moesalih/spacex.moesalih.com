@@ -3,42 +3,17 @@ var admin = require("firebase-admin");
 admin.initializeApp();
 var bucket = admin.storage().bucket();
 
-const fs = require('fs')
-const util = require('util')
 const axios = require('axios');
 const cheerio = require('cheerio')
-const mustache = require('mustache')
 const moment = require('moment-timezone')
 const ical = require('ical-generator')
 
-const readFile_ = util.promisify(fs.readFile);
 
 
 
 let cacheControl = 'public, max-age=1800'
 
-
-exports.testCache = functions.https.onRequest(async (request, response) => {
-	try {
-		let launches = await cache('https://spacex.moesalih.com/api', 'launches.json')
-		let starlink = await cache('https://spacex.moesalih.com/starlink/api', 'starlink.json')
-		response.json({ launches, starlink })
-
-	} catch (e) {
-		console.log(e);
-		response.json({ error: e })
-	}
-})
-
-exports.scheduledCache = functions.pubsub.schedule('every 30 minutes').onRun(async (context) => {
-	await cache('https://spacex.moesalih.com/api', 'launches.json')
-	await cache('https://spacex.moesalih.com/starlink/api', 'starlink.json')
-	// await axios.get('https://spacex.moesalih.com/starlink/api')
-	return null
-})
-
-let cache = async (url, file) => {
-	let { data } = await axios.get(url)
+let saveCache = async (data, file) => {
 	if (!data) { return null }
 	await bucket.file(file).save(JSON.stringify(data), {
 		metadata: {
@@ -50,36 +25,50 @@ let cache = async (url, file) => {
 
 
 
-exports.starlinkApi = require('./starlink').starlinkApi
 
-exports.launchesApi = functions.https.onRequest(async (request, response) => {
+
+exports.testCacheStarlink = functions.https.onRequest(async (request, response) => {
 	try {
-		let data = await getLaunches()
+		let data = await require('./starlink').getStarlinkData()
 		if (!data) { throw null }
-
-		response.header('Access-Control-Allow-Origin', '*')
-		response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
-		response.set('Cache-Control', cacheControl)
+		await saveCache(data, 'starlink.json')
 		response.json(data)
-
 	} catch (e) {
+		console.error(e)
 		response.json({ error: e })
+	}
+})
+exports.scheduledCacheStarlink = functions.pubsub.schedule('every 60 minutes').onRun(async (context) => {
+	try {
+		let data = await require('./starlink').getStarlinkData()
+		if (!data) { throw null }
+		await saveCache(data, 'starlink.json')
+	} catch (e) {
+		console.error(e)
 	}
 })
 
 
-exports.launches = functions.https.onRequest(async (request, response) => {
+
+
+exports.testCacheLaunches = functions.https.onRequest(async (request, response) => {
 	try {
 		let data = await getLaunches()
 		if (!data) { throw null }
-
-		let template = await readFile_('launches.mustache', 'utf8')
-
-		response.set('Cache-Control', cacheControl)
-		response.send(mustache.render(template, data));
-
+		await saveCache(data, 'launches.json')
+		response.json(data)
 	} catch (e) {
-		response.json({ error: e });
+		console.error(e)
+		response.json({ error: e })
+	}
+})
+exports.scheduledCacheLaunches = functions.pubsub.schedule('every 60 minutes').onRun(async (context) => {
+	try {
+		let data = await getLaunches()
+		if (!data) { throw null }
+		await saveCache(data, 'launches.json')
+	} catch (e) {
+		console.error(e)
 	}
 })
 
@@ -116,7 +105,6 @@ exports.launchesCal = functions.https.onRequest(async (request, response) => {
 		response.json({ error: e.message });
 	}
 })
-
 
 
 async function getLaunches() {

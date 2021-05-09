@@ -9,16 +9,8 @@
 		],
 		"rewrites": [
 			{
-				"source": "/api",
-				"function": "launchesApi"
-			},
-			{
 				"source": "/calendar",
 				"function": "launchesCal"
-			},
-			{
-				"source": "/starlink/api",
-				"function": "starlinkApi"
 			},
 			{
 				"source": "/starlink",
@@ -27,6 +19,18 @@
 			{
 				"source": "/",
 				"destination": "/index.html"
+			}
+		],
+		"redirects": [
+			{
+				"source": "/api",
+				"destination": "https://firebasestorage.googleapis.com/v0/b/spacex-launches-318bc.appspot.com/o/launches.json?alt=media",
+				"type": 302
+			},
+			{
+				"source": "/starlink/api",
+				"destination": "https://firebasestorage.googleapis.com/v0/b/spacex-launches-318bc.appspot.com/o/starlink.json?alt=media",
+				"type": 302
 			}
 		]
 	}

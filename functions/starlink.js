@@ -7,28 +7,8 @@ const { getEpochTimestamp, getSatelliteInfo } = require('tle.js');
 
 module.exports = {}
 
-module.exports.starlinkApi = functions.https.onRequest(async (request, response) => {
-	// module.exports.test = functions.https.onCall(async (data, context) => {
 
-	try {
-
-		let data = await getStarlinkData()
-
-		response.header('Access-Control-Allow-Origin', '*')
-		response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
-		response.set('Cache-Control', 'public, max-age=1800')
-		response.json(data)
-
-	} catch(e) {
-		console.error(e)
-		response.json({ error: e })
-	}
-})
-
-
-let array_chunks = (array, chunk_size) => Array(Math.ceil(array.length / chunk_size)).fill(0).map((_, index) => index * chunk_size).map(begin => array.slice(begin, begin + chunk_size));
-
-let getStarlinkData = async () => {
+module.exports.getStarlinkData = async () => {
 	// Login to space-track.org
 	let loginReposnse = await axios.post('https://www.space-track.org/ajaxauth/login', {
 		identity: functions.config().spacetrack.email,
@@ -36,98 +16,53 @@ let getStarlinkData = async () => {
 	})
 	let cookie = loginReposnse.headers['set-cookie'][0]
 
-
-	// get list of satellite IDs
-	let satelliteIdsResponse = await axios.get('https://www.space-track.org/basicspacedata/query/class/satcat/SATNAME/~~starlink/orderby/NORAD_CAT_ID%20asc/', {
+	// get satellite data
+	let satelliteDataResponse = await axios.get('https://www.space-track.org/basicspacedata/query/class/gp/OBJECT_NAME/~~starlink/orderby/NORAD_CAT_ID%20asc/emptyresult/show', {
 		headers: { 'Cookie': cookie }
 	})
-	let satelliteIds = satelliteIdsResponse.data.map(d => d.NORAD_CAT_ID)
+	let starlinkData = satelliteDataResponse.data.map(parseSatelliteData)
 
-
-	// get TLEs
-	let satelliteIdsChunks = array_chunks(satelliteIds, 500)
-	console.log(satelliteIdsChunks.length);
-
-	let promises = satelliteIdsChunks.map(satelliteIds => {
-		let satelliteIdsText = satelliteIds.join(',')
-		console.log(satelliteIdsText);
-
-		return axios.get('https://www.space-track.org/basicspacedata/query/class/gp/NORAD_CAT_ID/'+satelliteIdsText+'/orderby/TLE_LINE1 ASC/format/3le', {
-			headers: { 'Cookie': cookie }
-		}).then(dataResponse => {
-			console.log('response');
-			let data = parseTLE(dataResponse.data)
-			return data
-		})
-	})
-
-	return Promise.all(promises).then(data => {
-		let finalData = []
-		for (const d of data) {
-			finalData = finalData.concat(d)
-		}
-		return new Promise((resolve, reject) => resolve(finalData))
-	})
+	return starlinkData
 }
 
+let parseSatelliteData = (satelliteData) => {
+	let data = {}
+	data.name = satelliteData.OBJECT_NAME
+	data.launchDate = satelliteData.LAUNCH_DATE
 
-let parseTLE = (tle) => {
-	let lines = tle.split('\n').map(l => l.trim())
-	// console.log(lines)
-
-	let satellites = []
-	let currentSatellite
-
-	for (var line of lines) {
-		// console.log(line)
-		let components = line.split(' ').filter(c => !!c)
-		// console.log(components)
-
-		switch (components[0]) {
-
-			case '0': // satellite name
-			currentSatellite = { name: components[1] }
-			break
-
-			case '1': // info
-			currentSatellite.tle1 = line
-			currentSatellite.designator = components[2]
-			currentSatellite.launch = designatorToLaunchNumber(currentSatellite.designator)
-			let yearText = components[3].substring(0,2)
-			currentSatellite.year = parseInt(yearText) + 2000
-			let dayText = components[3].substring(2)
-			currentSatellite.day = parseFloat(dayText)
-			break
-
-			case '2': // data
-			currentSatellite.tle2 = line
-			currentSatellite.id = components[1]
-			currentSatellite.inclination = parseFloat(components[2])
-			currentSatellite.longitudeAscendingNode = parseFloat(components[3])
-			currentSatellite.argumentOfPerigee = parseFloat(components[5])
-			currentSatellite.anomaly = parseFloat(components[6])
-			currentSatellite.motion = parseFloat(components[7])
-
-			try {
-				let tle = [currentSatellite.tle1,currentSatellite.tle2]
-				currentSatellite.timestamp = getEpochTimestamp(tle)
-				currentSatellite.info = getSatelliteInfo(tle)
-			} catch (e) {
-				// console.log(e);
-				currentSatellite.info = {}
-			}
-			satellites.push(currentSatellite)
-			currentSatellite = null
-			break
-
-			default:
-			break
-		}
-
+	if (satelliteData.TLE_LINE1) {
+		data.tle1 = satelliteData.TLE_LINE1
+		let components = satelliteData.TLE_LINE1.split(' ').filter(c => !!c)
+		data.designator = components[2]
+		data.launch = designatorToLaunchNumber(data.designator)
+		let yearText = components[3].substring(0,2)
+		data.year = parseInt(yearText) + 2000
+		let dayText = components[3].substring(2)
+		data.day = parseFloat(dayText)
+	}
+	if (satelliteData.TLE_LINE2) {
+		data.tle2 = satelliteData.TLE_LINE2
+		let components = satelliteData.TLE_LINE2.split(' ').filter(c => !!c)
+		data.id = components[1]
+		data.inclination = parseFloat(components[2])
+		data.longitudeAscendingNode = parseFloat(components[3])
+		data.argumentOfPerigee = parseFloat(components[5])
+		data.anomaly = parseFloat(components[6])
+		data.motion = parseFloat(components[7])
 	}
 
-	return satellites
+	try {
+		let tle = [data.tle1, data.tle2]
+		data.timestamp = getEpochTimestamp(tle)
+		data.info = getSatelliteInfo(tle)
+	} catch (e) {
+		// console.log(e);
+		data.info = {}
+	}
+
+	return data
 }
+
 
 let designatorToLaunchNumber = (designator) => {
 	let launches = {

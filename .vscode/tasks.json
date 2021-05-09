@@ -10,8 +10,8 @@
 		},
 		{
 			"type": "shell",
-			"command": "firebase deploy --only functions:starlinkApi",
-			"label": "🔥👍 starlinkApi",
+			"command": "firebase deploy --only functions:testCacheStarlink,functions:scheduledCacheStarlink",
+			"label": "🔥👍 starlink functions",
 		},
 		{
 			"type": "shell",
