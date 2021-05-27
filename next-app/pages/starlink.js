@@ -17,6 +17,7 @@ let colors = [
 	'100,100,100',
 
 	'140,140,140',
+	'140,140,140',
 
 	'54, 162, 235',
 	'100, 200, 75',
@@ -237,6 +238,7 @@ export default class Starlink extends React.Component {
 						let label = [
 							'Launch: ' + satellite.launch,
 							'Designator: ' + satellite.designator,
+							'Launch Date: ' + satellite.launchDate,
 							'',
 							'Anomaly past Ascending Node: ' + satellite.currentAnomalyPastAscensingNode,
 							'Longitude of Ascending Node: ' + satellite.currentLongitudeAscendingNode,

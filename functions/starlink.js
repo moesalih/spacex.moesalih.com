@@ -67,8 +67,8 @@ let parseSatelliteData = (satelliteData) => {
 let designatorToLaunchNumber = (designator) => {
 	let launches = {
 		'19029': 'Starlink-0',
-		'19074': 'Starlink 1-10',
 
+		'19074': 'Starlink 1-10',
 		'20001': 'Starlink 1-10',
 		'20006': 'Starlink 1-10',
 		'20012': 'Starlink 1-10',
@@ -78,11 +78,12 @@ let designatorToLaunchNumber = (designator) => {
 		'20038': 'Starlink 1-10',
 		'20055': 'Starlink 1-10',
 		'20057': 'Starlink 1-10',
-		'20062': 'Starlink-11',
-		'20070': 'Starlink-12',
-		'20073': 'Starlink-13',
-		'20074': 'Starlink-14',
-		'20088': 'Starlink-15',
+
+		'20062': 'Starlink 11-15',
+		'20070': 'Starlink 11-15',
+		'20073': 'Starlink 11-15',
+		'20074': 'Starlink 11-15',
+		'20088': 'Starlink 11-15',
 		
 		'21005': 'Starlink-16',
 		'21006': 'Starlink-Polar',
@@ -90,11 +91,15 @@ let designatorToLaunchNumber = (designator) => {
 		'21012': 'Starlink-19',
 		'21017': 'Starlink-17',
 		'21018': 'Starlink-20',
+
 		'21021': 'Starlink-21',
 		'21024': 'Starlink-22',
 		'21027': 'Starlink-23',
 		'21036': 'Starlink-24',
 		'21038': 'Starlink-25',
+
+		'21040': 'Starlink-27',
+		'21041': 'Starlink-26',
 	}
 	for (var l in launches) {
 		if (designator.includes(l)) return launches[l]
