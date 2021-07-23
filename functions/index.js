@@ -114,11 +114,11 @@ async function getLaunches() {
 		if (!response.data) { throw null }
 
 		var $ = cheerio.load(response.data)
+		
 		var futureLaunchesH2 = $("#Future_launches").parent()
+		var futureLaunchesTable = futureLaunchesH2.nextAll('table')
 
-		var table = futureLaunchesH2.nextAll('table')
-
-		var rows = table.find("tr")
+		var rows = futureLaunchesTable.find("tr")
 		rows = rows.filter(function (i, el) {
 			if ($(this).find("th").length > 0) return false // hide header
 			if ($(this).find("td").first().attr("colspan") == 6) return false // hide year rows
@@ -128,6 +128,7 @@ async function getLaunches() {
 		var data = {
 			launches: []
 		}
+
 		var launch = {}
 		rows.each(function (i, el) {
 			$(this).find('br').replaceWith(' ')
@@ -142,9 +143,7 @@ async function getLaunches() {
 				launch.type = removeReferences(children.eq(1).text())
 				launch.site = removeReferences(children.eq(2).text())
 				launch.payload = removeReferences(children.eq(3).text())
-				if (launch.payload.includes('Starlink')) launch.payloadIcon = '🛰'
-				if (launch.payload.includes('GPS')) launch.payloadIcon = '📍'
-				if (launch.payload.includes('CRS')) launch.payloadIcon = '📦'
+				launch.payloadIcon = getPayloadIcon(launch.payload)
 				launch.orbit = removeReferences(children.eq(4).text())
 				launch.customer = removeReferences(children.eq(5).text())
 			}
@@ -153,13 +152,49 @@ async function getLaunches() {
 			}
 			else if (children.first().attr("colspan")) {
 				launch.note = removeReferences(children.eq(0).text())
-				if (launch.note.toLowerCase().includes('astronaut')) launch.payloadIcon = '👨‍🚀'
-				if (launch.note.toLowerCase().includes('lunar')) launch.payloadIcon = '🌘'
-				if (launch.note.toLowerCase().includes('classified')) launch.payloadIcon = '👽'
-				if (launch.note.toLowerCase().includes('tourist')) launch.payloadIcon = '👨‍🚀'
+				launch.payloadIcon = launch.payloadIcon || getPayloadIcon(launch.note)
 				data.launches.push(launch)
 			}
+		})
 
+		
+		var pastLaunchesH2 = $("#Past_launches").parent()
+		var pastLaunchesTable = pastLaunchesH2.nextAll('table.collapsible')
+
+		var rows = pastLaunchesTable.find("tr")
+		rows = rows.filter(function (i, el) {
+			if ($(this).find("th").length > 2) return false // hide header
+			// if ($(this).find("td").first().attr("colspan") == 6) return false // hide year rows
+			return true
+		})
+		data.pastLaunches = []
+		var launch = {}
+		rows.each(function (i, el) {
+			$(this).find('br').replaceWith(' ')
+			var children = $(this).children()
+			// console.log(children.length)
+			if (children.first().attr("rowspan")) {
+				launch = {}
+				launch.dateText = removeReferences(children.eq(1).text())
+				launch.dateText = launch.dateText.replace(/(\d\d:\d\d)/, ' $1')
+				if (launch.dateText.match(/(\d\d:\d\d)/)) launch.date = new Date(launch.dateText + ' UTC')
+				if (isNaN(launch.date)) launch.date = null
+				launch.type = removeReferences(children.eq(2).text())
+				launch.site = removeReferences(children.eq(3).text())
+				launch.payload = removeReferences(children.eq(4).text())
+				launch.payloadIcon = getPayloadIcon(launch.payload)
+				launch.orbit = removeReferences(children.eq(6).text())
+				launch.customer = removeReferences(children.eq(7).text())
+				launch.outcome = removeReferences(children.eq(8).text())
+			}
+			else if (!children.first().attr("colspan") && children.length == 2) {
+				launch.type += ', ' + removeReferences(children.eq(0).text())
+			}
+			else if (children.first().attr("colspan")) {
+				launch.note = removeReferences(children.eq(0).text())
+				launch.payloadIcon = launch.payloadIcon || getPayloadIcon(launch.note)
+				data.pastLaunches.push(launch)
+			}
 		})
 
 		// console.log(data)
@@ -169,6 +204,17 @@ async function getLaunches() {
 		console.error(e);
 		return null
 	}
+}
+
+function getPayloadIcon(text) {
+	if (text.toLowerCase().includes('starlink')) return '🛰'
+	if (text.toLowerCase().includes('gps')) return '📍'
+	if (text.toLowerCase().includes('crs')) return '📦'
+	if (text.toLowerCase().includes('astronaut')) return '👨‍🚀'
+	if (text.toLowerCase().includes('lunar')) return '🌘'
+	if (text.toLowerCase().includes('classified')) return '👽'
+	if (text.toLowerCase().includes('tourist')) return '👨‍🚀'
+	return null
 }
 
 function removeReferences(string) {

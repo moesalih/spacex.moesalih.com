@@ -9,7 +9,7 @@ export default class Index extends React.Component {
 
 	constructor(props) {
 		super(props)
-		this.state = { }
+		this.state = { showView: 'upcoming' }
 		this.getLaunches = this.getLaunches.bind(this)
 		this.getLaunches()
 		// this.onGenerate = this.onGenerate.bind(this)
@@ -23,14 +23,15 @@ export default class Index extends React.Component {
 	  try {
 	    const response = await axios.get('https://firebasestorage.googleapis.com/v0/b/spacex-launches-318bc.appspot.com/o/launches.json?alt=media');
 	    // console.log(response.data);
-		 this.setState({ launches: response.data.launches })
+		 this.setState({ launches: response.data.launches, pastLaunches: response.data.pastLaunches.reverse() })
 	  } catch (error) {
 	    console.error(error);
 	  }
 	}
 
 	render() {
-		let arr = []
+		let getLaunches = () => { return this.state.showView == 'upcoming' ? this.state.launches : this.state.pastLaunches }
+
 		return (
 			<div>
 				<Head>
@@ -63,10 +64,10 @@ export default class Index extends React.Component {
 
 				<div class="container-lg my-4 my-lg-5">
 
-				<div class="float-right mt-1">
-					<Link href="/starlink" ><a><span class="d-none d-md-inline-block">Starlink 🛰</span><span class="d-md-none h5 text-decoration-none mr-2">🛰</span></a></Link>
-					<a href="#info" class="d-md-none h5 text-muted text-decoration-none"><i class="feather icon-info"></i></a>
-				</div>
+					<div class="float-right mt-1">
+						<Link href="/starlink" ><a><span class="d-none d-md-inline-block">Starlink 🛰</span><span class="d-md-none h5 text-decoration-none mr-2">🛰</span></a></Link>
+						<a href="#info" class="d-md-none h5 text-muted text-decoration-none"><i class="feather icon-info"></i></a>
+					</div>
 
 					<h3 class="mb-5">SpaceX Launches 🚀</h3>
 
@@ -74,16 +75,22 @@ export default class Index extends React.Component {
 						<div class="col-md-9">
 
 						{!this.state.launches &&
-							<div class="text-center my-5 text-black-50"><div class="spinner-border" role="status"></div></div>
+							<div class="text-center my-5 text-muted"><div class="spinner-border" role="status"></div></div>
 						}
 
-						{this.state.launches && this.state.launches.map((l,i) =>
-							<div key={i}>
+						{this.state.launches &&
+							<div class="btn-group btn-group-sm mb-4" role="group" >
+								<button type="button" className={"btn btn-outline-secondary " + (this.state.showView == 'upcoming' ? 'active' : '')} onClick={(e) => { e.preventDefault(); this.setState({ showView: 'upcoming' }) }}>Upcoming</button>
+								<button type="button" className={"btn btn-outline-secondary " + (this.state.showView == 'past' ? 'active' : '')} onClick={(e) => { e.preventDefault(); this.setState({ showView: 'past' }) }}>Past</button>
+							</div>
+						}
+
+						{getLaunches() && getLaunches().map((l,i) =>
+							<div key={i} className="mb-4">
 								<div class="font-weight-bold">{l.dateText}</div>
 								<div class="my-1">{l.payloadIcon} {l.payload} • {l.customer}</div>
-								<div class="small font-weight-bold my-1" style={{opacity:0.5}}>{l.type} • {l.site} • {l.orbit}</div>
-								<div class="small" style={{opacity:0.5}}>{l.note}</div>
-								<hr />
+								<div class="small font-weight-bold my-1" style={{opacity:0.6}}>{l.type} • {l.site} • {l.orbit}</div>
+								<div class="small" style={{opacity:0.6}}>{l.note}</div>
 							</div>
 						)}
 
