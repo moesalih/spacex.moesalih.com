@@ -34,7 +34,7 @@ let parseSatelliteData = (satelliteData) => {
 		data.tle1 = satelliteData.TLE_LINE1
 		let components = satelliteData.TLE_LINE1.split(' ').filter(c => !!c)
 		data.designator = components[2]
-		data.launch = designatorToLaunchNumber(data.designator)
+		data.version = designatorToLaunchVersion(data.designator)
 		let yearText = components[3].substring(0,2)
 		data.year = parseInt(yearText) + 2000
 		let dayText = components[3].substring(2)
@@ -64,47 +64,46 @@ let parseSatelliteData = (satelliteData) => {
 }
 
 
-let designatorToLaunchNumber = (designator) => {
+let designatorToLaunchVersion = (designator) => {
 	let launches = {
-		'19029': 'Starlink-0',
+		'19029': 'Starlink v0.9',
 
-		'19074': 'Starlink 1-10',
-		'20001': 'Starlink 1-10',
-		'20006': 'Starlink 1-10',
-		'20012': 'Starlink 1-10',
-		'20019': 'Starlink 1-10',
-		'20025': 'Starlink 1-10',
-		'20035': 'Starlink 1-10',
-		'20038': 'Starlink 1-10',
-		'20055': 'Starlink 1-10',
-		'20057': 'Starlink 1-10',
-
-		'20062': 'Starlink 11-15',
-		'20070': 'Starlink 11-15',
-		'20073': 'Starlink 11-15',
-		'20074': 'Starlink 11-15',
-		'20088': 'Starlink 11-15',
+		'19074': 'Starlink v1.0',
+		'20001': 'Starlink v1.0',
+		'20006': 'Starlink v1.0',
+		'20012': 'Starlink v1.0',
+		'20019': 'Starlink v1.0',
+		'20025': 'Starlink v1.0',
+		'20035': 'Starlink v1.0',
+		'20038': 'Starlink v1.0',
+		'20055': 'Starlink v1.0',
+		'20057': 'Starlink v1.0',
+		'20062': 'Starlink v1.0',
+		'20070': 'Starlink v1.0',
+		'20073': 'Starlink v1.0',
+		'20074': 'Starlink v1.0',
+		'20088': 'Starlink v1.0',
 		
-		'21005': 'Starlink-16',
-		'21006': 'Starlink Polar 1',
-		'21009': 'Starlink-18',
-		'21012': 'Starlink-19',
-		'21017': 'Starlink-17',
-		'21018': 'Starlink-20',
+		'21005': 'Starlink v1.0',
+		'21006': 'Starlink v1.0',
+		'21009': 'Starlink v1.0',
+		'21012': 'Starlink v1.0',
+		'21017': 'Starlink v1.0',
+		'21018': 'Starlink v1.0',
+		'21021': 'Starlink v1.0',
+		'21024': 'Starlink v1.0',
+		'21027': 'Starlink v1.0',
+		'21036': 'Starlink v1.0',
+		'21038': 'Starlink v1.0',
+		'21040': 'Starlink v1.0',
+		'21041': 'Starlink v1.0',
+		'21044': 'Starlink v1.0',
+		'21059': 'Starlink v1.0',
 
-		'21021': 'Starlink-21',
-		'21024': 'Starlink-22',
-		'21027': 'Starlink-23',
-		'21036': 'Starlink-24',
-		'21038': 'Starlink-25',
-
-		'21040': 'Starlink-27',
-		'21041': 'Starlink-26',
-		'21044': 'Starlink-28',
-		'21059': 'Starlink Polar 2',
+		'21082': 'Starlink v1.5',
 	}
 	for (var l in launches) {
 		if (designator.includes(l)) return launches[l]
 	}
-	return 'Starlink-X'
+	return 'Starlink v1.5'
 }

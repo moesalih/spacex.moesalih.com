@@ -16,8 +16,7 @@ import worldData from 'planetary.js/dist/world-110m.json';
 let colors = [
 	'100,100,100',
 
-	'140,140,140',
-	'140,140,140',
+	// '140,140,140',
 
 	'54, 162, 235',
 	'100, 200, 75',
@@ -86,13 +85,13 @@ export default class Starlink extends React.Component {
 		}
 	}
 
-	getLaunches(satellites) {
-		let launches = satellites.map(s => s.launch).filter((v, i, a) => i == a.indexOf(v))
-		if (launches.includes('Starlink-X')) {
-			launches = launches.filter(l => l != 'Starlink-X')
-			launches.push('Starlink-X')
+	getVersions(satellites) {
+		let versions = satellites.map(s => s.version).filter((v, i, a) => i == a.indexOf(v))
+		if (versions.includes('Starlink-X')) {
+			versions = versions.filter(l => l != 'Starlink-X')
+			versions.push('Starlink-X')
 		}
-		return launches
+		return versions
 	}
 
 	calculateCurrentData = () => {
@@ -119,14 +118,14 @@ export default class Starlink extends React.Component {
 		// console.log(timestamp/1000)
 		let RAANchangePerSec = -5.19575e-05
 
-		let launches = this.getLaunches(this.originalSatellitesData)
+		let versions = this.getVersions(this.originalSatellitesData)
 		this.satellites = this.originalSatellitesData.map(s => {
 			let secondsInPast = (timestamp - s.timestamp) / 1000
 			let degPerSec = 360 * s.motion / (24 * 3600)
 
 			let data = {
 				...s,
-				color: colors[launches.indexOf(s.launch)],
+				color: colors[versions.indexOf(s.version)],
 				anomalyPastAscensingNode: (s.argumentOfPerigee + s.anomaly) % 360,
 
 				currentAnomalyPastAscensingNode: (s.argumentOfPerigee + s.anomaly + degPerSec * secondsInPast + 360) % 360,
@@ -149,11 +148,11 @@ export default class Starlink extends React.Component {
 
 	updateChart = () => {
 
-		let launches = this.getLaunches(this.satellites)
-		let datasets = launches.map((l, li) => {
-			let launchSatellites = this.satellites.filter(s => s.launch == l)
-			let points = launchSatellites.map(s => ({ y: s.currentAnomalyPastAscensingNode, x: s.currentLongitudeAscendingNode }))
-			let cc = launchSatellites.map(s => 'rgba(' + s.color + ', ' + Starlink.opacityFrom(s) + ')')
+		let versions = this.getVersions(this.satellites)
+		let datasets = versions.map((l, li) => {
+			let versionSatellites = this.satellites.filter(s => s.version == l)
+			let points = versionSatellites.map(s => ({ y: s.currentAnomalyPastAscensingNode, x: s.currentLongitudeAscendingNode }))
+			let cc = versionSatellites.map(s => 'rgba(' + s.color + ', ' + Starlink.opacityFrom(s) + ')')
 			return {
 				label: l,
 				pointRadius: 3,
@@ -165,7 +164,7 @@ export default class Starlink extends React.Component {
 				data: points
 			}
 		})
-		// console.log(satellites, launches)
+		// console.log(satellites, versions)
 
 		let chartData = {
 			datasets: datasets
@@ -224,19 +223,19 @@ export default class Starlink extends React.Component {
 				callbacks: {
 					title: (tooltipItems, data) => {
 						let tooltipItem = tooltipItems[0]
-						let launch = launches[tooltipItem.datasetIndex]
-						let launchSatellites = this.satellites.filter(s => s.launch == launch)
-						let satellite = launchSatellites[tooltipItem.index]
+						let version = versions[tooltipItem.datasetIndex]
+						let versionSatellites = this.satellites.filter(s => s.version == version)
+						let satellite = versionSatellites[tooltipItem.index]
 						return satellite.name
 					},
 					label: (tooltipItem, data) => {
-						let launch = launches[tooltipItem.datasetIndex]
-						let launchSatellites = this.satellites.filter(s => s.launch == launch)
-						let satellite = launchSatellites[tooltipItem.index]
+						let version = versions[tooltipItem.datasetIndex]
+						let versionSatellites = this.satellites.filter(s => s.version == version)
+						let satellite = versionSatellites[tooltipItem.index]
 
 
 						let label = [
-							'Launch: ' + satellite.launch,
+							'Version: ' + satellite.version,
 							'Designator: ' + satellite.designator,
 							'Launch Date: ' + satellite.launchDate,
 							'',
@@ -494,7 +493,7 @@ export default class Starlink extends React.Component {
 										}
 										<div class="btn-group btn-group-sm mx-2 mb-2" role="group" >
 											<button type="button" className={"btn btn-outline-secondary " + (this.state.showView == 'globe' ? 'active' : '')} onClick={(e) => { e.preventDefault(); this.setState({ showView: 'globe' }) }}>Globe</button>
-											<button type="button" className={"btn btn-outline-secondary " + (this.state.showView == 'map' ? 'active' : '')} onClick={(e) => { e.preventDefault(); this.setState({ showView: 'map' }) }}>Map</button>
+											{/* <button type="button" className={"btn btn-outline-secondary " + (this.state.showView == 'map' ? 'active' : '')} onClick={(e) => { e.preventDefault(); this.setState({ showView: 'map' }) }}>Map</button> */}
 											<button type="button" className={"btn btn-outline-secondary " + (this.state.showView == 'params' ? 'active' : '')} onClick={(e) => { e.preventDefault(); this.setState({ showView: 'params' }) }}>Parameters</button>
 										</div>
 									</div>
