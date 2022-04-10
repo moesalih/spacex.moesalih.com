@@ -13,35 +13,35 @@ import worldData from 'planetary.js/dist/world-110m.json';
 
 
 
-let colors = [
-	'100,100,100',
+// let colors = [
+// 	'100,100,100',
 
-	// '140,140,140',
+// 	// '140,140,140',
 
-	'54, 162, 235',
-	'100, 200, 75',
-	'255, 99, 172',
-	'255, 206, 86',
-	'153, 102, 255',
-	'75, 192, 192',
-	'192, 192, 75',
-	'255, 120, 99',
-	'255, 159, 64',
-	'100, 120, 200',
-	'255, 206, 86',
-	'50, 200, 50',
-	'200, 100, 100',
-	'54, 162, 235',
-	'255, 99, 172',
-	'100, 200, 75',
+// 	'54, 162, 235',
+// 	'100, 200, 75',
+// 	'255, 99, 172',
+// 	'255, 206, 86',
+// 	'153, 102, 255',
+// 	'75, 192, 192',
+// 	'192, 192, 75',
+// 	'255, 120, 99',
+// 	'255, 159, 64',
+// 	'100, 120, 200',
+// 	'255, 206, 86',
+// 	'50, 200, 50',
+// 	'200, 100, 100',
+// 	'54, 162, 235',
+// 	'255, 99, 172',
+// 	'100, 200, 75',
 
-	'160,160,160',
-	'160,160,160',
-	'160,160,160',
-	'160,160,160',
-	'160,160,160',
-	'160,160,160',
-]
+// 	'160,160,160',
+// 	'160,160,160',
+// 	'160,160,160',
+// 	'160,160,160',
+// 	'160,160,160',
+// 	'160,160,160',
+// ]
 const center = {
 	lat: 0,
 	lng: 0
@@ -85,14 +85,14 @@ export default class Starlink extends React.Component {
 		}
 	}
 
-	getVersions(satellites) {
-		let versions = satellites.map(s => s.version).filter((v, i, a) => i == a.indexOf(v))
-		if (versions.includes('Starlink-X')) {
-			versions = versions.filter(l => l != 'Starlink-X')
-			versions.push('Starlink-X')
-		}
-		return versions
-	}
+	// getVersions(satellites) {
+	// 	let versions = satellites.map(s => s.version).filter((v, i, a) => i == a.indexOf(v))
+	// 	if (versions.includes('Starlink-X')) {
+	// 		versions = versions.filter(l => l != 'Starlink-X')
+	// 		versions.push('Starlink-X')
+	// 	}
+	// 	return versions
+	// }
 
 	calculateCurrentData = () => {
 		clearTimeout(this.timer)
@@ -118,14 +118,14 @@ export default class Starlink extends React.Component {
 		// console.log(timestamp/1000)
 		let RAANchangePerSec = -5.19575e-05
 
-		let versions = this.getVersions(this.originalSatellitesData)
+		// let versions = this.getVersions(this.originalSatellitesData)
 		this.satellites = this.originalSatellitesData.map(s => {
 			let secondsInPast = (timestamp - s.timestamp) / 1000
 			let degPerSec = 360 * s.motion / (24 * 3600)
 
 			let data = {
 				...s,
-				color: colors[versions.indexOf(s.version)],
+				color: '200,200,200',
 				anomalyPastAscensingNode: (s.argumentOfPerigee + s.anomaly) % 360,
 
 				currentAnomalyPastAscensingNode: (s.argumentOfPerigee + s.anomaly + degPerSec * secondsInPast + 360) % 360,
@@ -148,17 +148,17 @@ export default class Starlink extends React.Component {
 
 	updateChart = () => {
 
-		let versions = this.getVersions(this.satellites)
-		let datasets = versions.map((l, li) => {
-			let versionSatellites = this.satellites.filter(s => s.version == l)
-			let points = versionSatellites.map(s => ({ y: s.currentAnomalyPastAscensingNode, x: s.currentLongitudeAscendingNode }))
-			let cc = versionSatellites.map(s => 'rgba(' + s.color + ', ' + Starlink.opacityFrom(s) + ')')
+		// let versions = this.getVersions(this.satellites)
+		let datasets = [''].map((l, li) => {
+			// let versionSatellites = this.satellites.filter(s => s.version == l)
+			let points = this.satellites.map(s => ({ y: s.currentAnomalyPastAscensingNode, x: s.currentLongitudeAscendingNode }))
+			let cc = this.satellites.map(s => 'rgba(' + s.color + ', ' + Starlink.opacityFrom(s) + ')')
 			return {
 				label: l,
-				pointRadius: 3,
+				pointRadius: 2,
 				pointBackgroundColor: cc,
-				backgroundColor: 'rgba(' + colors[li] + ', 1)',
-				borderColor: 'rgba(' + colors[li] + ', 0.25)',
+				backgroundColor: 'rgba(' + '160,160,160' + ', 1)',
+				borderColor: 'rgba(' + '160,160,160' + ', 0.25)',
 				pointBorderWidth: 0,
 				pointHoverRadius: 6,
 				data: points
@@ -173,10 +173,8 @@ export default class Starlink extends React.Component {
 		let chartOptions = {
 			maintainAspectRatio: false,
 			animation: false,
-			// legend: {
-			// 	display: false
-			// },
 			legend: {
+				display: false,
 				labels: {
 					boxWidth: 20,
 				},
@@ -223,19 +221,19 @@ export default class Starlink extends React.Component {
 				callbacks: {
 					title: (tooltipItems, data) => {
 						let tooltipItem = tooltipItems[0]
-						let version = versions[tooltipItem.datasetIndex]
-						let versionSatellites = this.satellites.filter(s => s.version == version)
-						let satellite = versionSatellites[tooltipItem.index]
+						// let version = versions[tooltipItem.datasetIndex]
+						// let versionSatellites = this.satellites.filter(s => s.version == version)
+						let satellite = this.satellites[tooltipItem.index]
 						return satellite.name
 					},
 					label: (tooltipItem, data) => {
-						let version = versions[tooltipItem.datasetIndex]
-						let versionSatellites = this.satellites.filter(s => s.version == version)
-						let satellite = versionSatellites[tooltipItem.index]
+						// let version = versions[tooltipItem.datasetIndex]
+						// let versionSatellites = this.satellites.filter(s => s.version == version)
+						let satellite = this.satellites[tooltipItem.index]
 
 
 						let label = [
-							'Version: ' + satellite.version,
+							// 'Version: ' + satellite.version,
 							'Designator: ' + satellite.designator,
 							'Launch Date: ' + satellite.launchDate,
 							'',
@@ -574,16 +572,13 @@ export default class Starlink extends React.Component {
 									{/* <div class=""><a href="https://www.n2yo.com/satellites/?c=52&srt=12&dir=0" target="_blank">n2yo.com</a></div> */}
 
 									<div class="mt-3 text-uppercase small text-muted">Created by</div>
-									<div class=""><a href="https://moesalih.com" target="_blank" class="mr-3">Moe Salih</a></div>
+									<div class=""><a href="https://0xMoe.com" target="_blank" class="mr-3">MOΞ</a></div>
 
 									<div class="mt-3 text-uppercase small text-muted">Contact</div>
 									<div class=""><a href="mailto:moe.salih@gmail.com" target="_blank" class="text-decoration-none mr-2"><i class="feather icon-mail"></i></a> <a href="https://twitter.com/moesalih_" target="_blank" class="text-decoration-none mr-2"><i class="feather icon-twitter"></i></a></div>
 
 									<div class="mt-3 text-uppercase small text-muted">Code</div>
 									<div class=""><a href="https://github.com/moesalih/spacex.moesalih.com" target="_blank" class="mr-3">GitHub</a></div>
-
-									<div class="mt-3 text-uppercase small text-muted">Support this site</div>
-									<div class=""><a href="https://www.paypal.me/moesalih1" target="_blank">Donate</a> 🙏</div>
 
 								</div>
 							</div>
@@ -636,7 +631,7 @@ class Planet extends React.Component {
 		this.planet.onDraw(() => {
 			this.planet.withSavedContext((context) => {
 
-				context.lineWidth = 5
+				context.lineWidth = 3
 
 				this.getCircles().forEach(circle => {
 					context.strokeStyle = circle.color
