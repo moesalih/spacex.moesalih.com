@@ -214,6 +214,7 @@ function getPayloadIcon(text) {
 	if (text.toLowerCase().includes('lunar')) return '🌘'
 	if (text.toLowerCase().includes('classified')) return '👽'
 	if (text.toLowerCase().includes('tourist')) return '👨‍🚀'
+	if (text.toLowerCase().includes('rideshare')) return '🚌'
 	return null
 }
 

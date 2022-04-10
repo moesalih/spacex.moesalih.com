@@ -27,7 +27,7 @@ export default class Index extends React.Component {
 			// console.log(response.data);
 			this.setState({ launches: response.data.launches, pastLaunches: response.data.pastLaunches.reverse() })
 
-			if (this.state.pastLaunches) {
+			if (this.state.launches && this.state.pastLaunches) {
 				let vehicles = ['F9 v1.0', 'F9 v1.1', 'F9 FT', 'F9 B4', 'F9 B5', 'Falcon Heavy']
 				let colors = [
 					'rgba(255, 99, 132, 1)',
@@ -38,24 +38,38 @@ export default class Index extends React.Component {
 					'rgba(255, 159, 64, 1)',
 				]
 
-				let labels = []
-				for (let index = 2010; index <= moment().year(); index++) {
-					labels.push(index)
+				let getChartData = (yearLabels, launches) => {
+					let getYearFromDateText = (launchDateText) => {
+						for (let y of yearLabels) { if (launchDateText.includes(y)) { return y } }
+					}
+					let data = {
+						labels: yearLabels,
+						datasets: vehicles.map((v, i) => {
+							let years = launches.filter(launch => launch.type.includes(v)).map(launch => getYearFromDateText(launch.dateText))
+							let counts = years.reduce((map, val) => { map[val] = (map[val] || 0) + 1; return map }, {})
+							return {
+								label: v,
+								data: yearLabels.map(y => counts[y] || 0),
+								backgroundColor: colors[i],
+							}
+						}),
+					};
+					return data
 				}
 
-				const data = {
-					labels: labels,
-					datasets: vehicles.map((v, i) => {
-						let years = this.state.pastLaunches.filter(launch => launch.type.includes(v)).map(launch => moment(launch.date).year())
-						let counts = years.reduce((map, val) => { map[val] = (map[val] || 0) + 1; return map }, {})
-						return {
-							label: v,
-							data: labels.map(l => counts[l] || 0),
-							backgroundColor: colors[i],
-						}
-					}),
-				};
-				const options = {
+				let pastYears = []
+				for (let index = 2010; index <= moment().year(); index++) {
+					pastYears.push(index)
+				}
+				let futureYears = []
+				for (let index = moment().year(); index <= moment().year()+4; index++) {
+					futureYears.push(index)
+				}
+
+				const pastChartData = getChartData(pastYears, this.state.pastLaunches)
+				const futureChartData = getChartData(futureYears, this.state.launches)
+
+				const chartOptions = {
 					maintainAspectRatio: false,
 					animation: false,
 					legend: {
@@ -94,7 +108,7 @@ export default class Index extends React.Component {
 					},
 				};
 
-				this.setState({ chartData: data, chartOptions: options })
+				this.setState({ pastChartData, futureChartData, chartOptions })
 			}
 
 
@@ -104,7 +118,7 @@ export default class Index extends React.Component {
 	}
 
 	render() {
-		let getLaunches = () => { return this.state.showView == 'upcoming' ? this.state.launches : this.state.pastLaunches }
+		let launches = this.state.showView == 'upcoming' ? this.state.launches : this.state.pastLaunches
 
 		return (
 			<div>
@@ -160,16 +174,23 @@ export default class Index extends React.Component {
 								</div>
 							}
 
-							{this.state.pastLaunches && this.state.showView == 'past' &&
+							{this.state.futureChartData && this.state.showView == 'upcoming' &&
 								<div class="mb-4 embed-responsive embed-responsive-16by9">
 									<div class="embed-responsive-item">
-										<Bar data={this.state.chartData} options={this.state.chartOptions} />
+										<Bar data={this.state.futureChartData} options={this.state.chartOptions} />
+									</div>
+								</div>
+							}
+							{this.state.pastChartData && this.state.showView == 'past' &&
+								<div class="mb-4 embed-responsive embed-responsive-16by9">
+									<div class="embed-responsive-item">
+										<Bar data={this.state.pastChartData} options={this.state.chartOptions} />
 									</div>
 								</div>
 							}
 
 
-							{getLaunches() && getLaunches().map((l, i) =>
+							{launches && launches.map((l, i) =>
 								<div key={i} className="mb-4">
 									<div class="font-weight-bold">{l.dateText}</div>
 									<div class="my-1">{l.payloadIcon} {l.payload} • {l.customer}</div>
@@ -189,16 +210,13 @@ export default class Index extends React.Component {
 									<div class="mb-3"><a href="https://en.wikipedia.org/wiki/List_of_Falcon_9_and_Falcon_Heavy_launches#Future_launches" target="_blank">Wikipedia: List of Falcon 9 and Falcon Heavy launches</a></div>
 
 									<div class="text-uppercase small text-muted">Created by</div>
-									<div class="mb-3"><a href="https://moesalih.com" target="_blank" class="mr-3">Moe Salih</a></div>
+									<div class="mb-3"><a href="https://0xMoe.com" target="_blank" class="mr-3">MOΞ</a></div>
 
 									<div class="text-uppercase small text-muted">Contact</div>
 									<div class="mb-3"><a href="mailto:moe.salih@gmail.com" target="_blank" class="text-decoration-none mr-2"><i class="feather icon-mail"></i></a> <a href="https://twitter.com/moesalih_" target="_blank" class="text-decoration-none mr-2"><i class="feather icon-twitter"></i></a></div>
 
 									<div class="text-uppercase small text-muted">Code</div>
 									<div class="mb-3"><a href="https://github.com/moesalih/spacex.moesalih.com" target="_blank" class="mr-3">GitHub</a></div>
-
-									<div class="text-uppercase small text-muted">Support this site</div>
-									<div class=""><a href="https://www.paypal.me/moesalih1" target="_blank">Donate</a> 🙏</div>
 
 								</div>
 							</div>
