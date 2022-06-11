@@ -10,8 +10,13 @@
 		},
 		{
 			"type": "shell",
+			"command": "firebase deploy --only functions:testCacheLaunches,functions:scheduledCacheLaunches,functions:launchesCal,functions:testLaunches",
+			"label": "🔥👍 functions:launches",
+		},
+		{
+			"type": "shell",
 			"command": "firebase deploy --only functions:testCacheStarlink,functions:scheduledCacheStarlink",
-			"label": "🔥👍 starlink functions",
+			"label": "🔥👍 functions:starlink",
 		},
 		{
 			"type": "shell",
